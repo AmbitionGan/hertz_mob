@@ -80,6 +80,7 @@ import orderApi from '../api/orderCompletion.js'
 export default {
     data(){
         return{
+            // TDES.encrypt(asdasd)
             elastic:false,          //弹框
             driverListShow:false,   //驾驶人列表
             //驾驶人列表

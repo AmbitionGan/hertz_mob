@@ -6,26 +6,15 @@
 
 // 公共参数
 const common = {
-<<<<<<< HEAD
     // 是否登陆
     isLogined: false,
     // 是否是代理商登陆
     isagent: false
-=======
 
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 }
 
 // 首页参数
 const index = {
-<<<<<<< HEAD
-
-}
-
-const state = {
-    common,
-    index
-=======
     // 日历 数据
     calendar: {},
     // 取车 城市
@@ -83,7 +72,6 @@ const state = {
 const state = {
     ...common,
     ...index
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 }
 
 export default state

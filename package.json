@@ -44,10 +44,7 @@
     "rimraf": "^2.6.0",
     "semver": "^5.3.0",
     "shelljs": "^0.7.6",
-<<<<<<< HEAD
-=======
     "swiper": "^3.4.2",
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
     "uglifyjs-webpack-plugin": "^1.1.1",
     "url-loader": "^0.5.8",
     "vue-loader": "^13.3.0",

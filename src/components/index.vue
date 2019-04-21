@@ -1,20 +1,10 @@
 <template>
-<<<<<<< HEAD
-	<div>
-		<!-- 首页导航 -->
-		<header class="header">
-			<span class="menu"></span>
-			<router-link to="/"><img src="@/assets/images/logo.jpg" alt=""></router-link>
-			<router-link to='/'></router-link>
-			<div class="language">
-=======
 	<div class="index">
 		<!-- 首页导航 -->
 		<header class="header clear">
 			<router-link to="/" class="logo left"><img src="@/assets/images/logo.jpg" alt=""></router-link>
 			<span class="menu right"></span>
 			<div class="language right">
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 				<span></span>
 				<ul>
 					<li></li>
@@ -24,29 +14,6 @@
 		<!-- 轮播图 -->
 		<div class="banner">
 			<div class="swiper-container">
-<<<<<<< HEAD
-				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<img src="" alt="">
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- 搜车 -->
-
-		<!-- 栏目列表 -->
-		<div class="columnList">
-			<ul>
-				<li><router-link to='/'></router-link></li>
-			</ul>
-		</div>
-
-		<!-- 品牌列表 -->
-		<div class="logoList">
-			<ul>
-				<li>
-					<router-link to='/'><img src="@/assets/images/banner_1.jpg" alt=""></router-link>
-=======
 				<div class="swiper-wrapper clear">
 					<div class="swiper-slide" v-for="item in bannerList" :key="item.id">
 						<img :src="item.src" alt="">
@@ -73,7 +40,6 @@
 			<ul class="clear">
 				<li v-for="(item, index) in logoList" :key="index">
 					<img :src="item.src" alt="">
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 				</li>
 			</ul>
 		</div>
@@ -81,13 +47,6 @@
 </template>
 
 <script>
-<<<<<<< HEAD
-export default {
-	name: 'index',
-	mounted () {
-		// this.$store.dispatch('getAreaCode');
-	}  
-=======
 import findCar from './common/findCar'
 
 export default {
@@ -135,16 +94,10 @@ export default {
 			})
 		}
 	}
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 }
 </script>
 
 <style scope lang="less">
-<<<<<<< HEAD
-	h1{
-		font-size: .48rem;
-		text-align: center;
-=======
 	body {
 		background: #f3f3f5;
 	}
@@ -245,6 +198,5 @@ export default {
 				vertical-align: middle;
 			}
 		}
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 	}
 </style>

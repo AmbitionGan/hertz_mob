@@ -23,18 +23,16 @@ const common = {
 
 // 首页方法
 const index = {
-<<<<<<< HEAD
     async getAreaCode () {
         let data = indexApi.getLandMark(null)
         indexApi.getAreaCode(null)
-=======
+    },
     // 如果第一次进入
     async getCalendar ({commit, state}, params) {
         if (state.takeCarYear === '' && state.takeCarMonth === '' && state.takeCarDay == '') {
             let data = await indexApi.getCalendar(params)
             commit('setCalendar', data.Result)
         }
->>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
     }
 }
 
