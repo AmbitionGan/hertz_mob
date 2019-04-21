@@ -24,12 +24,17 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
  * @param {String} str 
  */
 function jsonpChangeJson (str) {
+<<<<<<< HEAD
     
     let matches = str.match(/^\w+\((\{[^()]+\})\)$/);
     console.log(matches)
     if (matches) {
         return JSON.parse(matches[1]);
     }
+=======
+    let matches = str.replace(/^\w+\(/g, '').replace(/\)$/g, '');
+    return JSON.parse(matches);
+>>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 }
 
 const service = {
@@ -44,6 +49,10 @@ const service = {
                 params: params
             })
             .then(res => {
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
                 resolve(jsonpChangeJson(res.data));
             })
             .catch(err => {
@@ -66,6 +75,24 @@ const service = {
                 reject(err.data);
             })
       })
+<<<<<<< HEAD
+=======
+    },
+    /**
+     * @desc 直接返回JSON，不需要转换的
+     * @param {String} url 请求地址
+     */
+    getJson (url) {
+        return new Promise((resolve, reject) => {
+            axios.get(url)
+            .then(res => {
+                resolve(eval(res.data));
+            })
+            .catch(err => {
+                reject(err.data);
+            })
+        })
+>>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
     }
 }
 

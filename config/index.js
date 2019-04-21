@@ -22,7 +22,11 @@ module.exports = {
 
     // Various Dev Server settings
     host: '0.0.0.0', // can be overwritten by process.env.HOST
+<<<<<<< HEAD
     port: 8081, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+=======
+    port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+>>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
     autoOpenBrowser: false,
     errorOverlay: true,
     notifyOnErrors: true,
@@ -51,7 +55,11 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
+<<<<<<< HEAD
     assetsPublicPath: '/',
+=======
+    assetsPublicPath: '/hertz_phone/',
+>>>>>>> 6f9070f9a0ec6fa102df46daccbd81b6304908c3
 
     /**
      * Source Maps
