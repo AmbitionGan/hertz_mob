@@ -16,7 +16,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 // 注册全局 公共方法
-window['pubMethod'] = pubMethod
+window["pubMethod"] = pubMethod;
 
 Vue.prototype.Swiper = Swiper;
 
@@ -26,9 +26,9 @@ Vue.use(regToast)
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: "#app",
   router,
   store,
   components: { App },
-  template: '<App/>'
-})
+  template: "<App/>"
+});

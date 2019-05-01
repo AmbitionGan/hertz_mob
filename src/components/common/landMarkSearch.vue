@@ -44,21 +44,26 @@ export default {
         }
     },
     mounted () {
-        if (this.$route.query.isTakeCar == 1) {
-            // 选择取车城市的情况下
-            if (this.$store.state.takeCarLand != '') {
-                this.isFirstEnter = true
-                this.searchValue = this.$store.state.takeCarLand
-            }
-        }else{
-            // 选择换车城市的情况下 
-            if (this.$store.state.retCarLand != '') {
-                this.isFirstEnter = true
-                this.searchValue = this.$store.state.retCarLand
-            }
-        }
     },
     methods: {
+        /**
+         * 初始化
+         */
+        init () {
+            if (this.$store.state.isTakeCar) {
+                // 选择取车城市的情况下
+                if (this.$store.state.takeCarLand != '') {
+                    this.isFirstEnter = true
+                    this.searchValue = this.$store.state.takeCarLand
+                }
+            }else{
+                // 选择换车城市的情况下 
+                if (this.$store.state.retCarLand != '') {
+                    this.isFirstEnter = true
+                    this.searchValue = this.$store.state.retCarLand
+                }
+            }
+        },
         /**
          * 根据地标类型转换icon
          * @param {String} placetype 地标类型
@@ -88,7 +93,6 @@ export default {
             indexApi.getLandMark({type: 5, placekey: this.searchValue})
 			.then(res => {
                 this.$loadingToast.close()
-                this.isShowSearchList = true
                 this.searchData = []
                 if (res.Result.length > 0) {
                     this.searchData = res.Result
@@ -109,21 +113,56 @@ export default {
         chooseLandMark (index) {
             this.$store.state.isSearching = false
             let curData = this.searchData[index];
-            if (this.$route.query.isTakeCar == 1) {
-                // 取车情况下
+            if (this.$store.state.isTakeCar) {
+                // 选择取车城市的情况下
                 this.$store.state.takeCarLand = curData.placename
-                if (this.$store.state.retCarLand === '') {
+                this.$store.state.takeCarBrand = curData.brands
+                this.$store.state.takeCarGuid = curData.guid
+                this.$store.state.takeCarCountry = curData.countrycode
+                this.$store.state.takeCarCoor = curData.latitude + ',' + curData.longitude
+                // 如果还车地标等于空
+				if (this.$store.state.retCarLand === '') {
+                    // 还车地标 = 取车地标
                     this.$store.state.retCarLand = this.$store.state.takeCarLand
+                    this.$store.state.retCarBrand = this.$store.state.takeCarBrand
+                    this.$store.state.retCarGuid = this.$store.state.takeCarGuid
+                    this.$store.state.retCarCountry = this.$store.state.takeCarCountry
+                    this.$store.state.retCarCoor = this.$store.state.takeCarCoor
                 }
             }else{
-                // 还车情况下
+                // 选择换车城市的情况下
                 this.$store.state.retCarLand = curData.placename
-                if (this.$store.state.takeCarLand === '') {
+                this.$store.state.retCarBrand = curData.brands
+                this.$store.state.retCarGuid = curData.guid
+                this.$store.state.retCarCountry = curData.countrycode
+                this.$store.state.retCarCoor = curData.latitude + ',' + curData.longitude
+
+                // 如果取车地标等于空
+				if (this.$store.state.takeCarLand === '') {
+                    // 取车地标 = 还车地标
                     this.$store.state.takeCarLand = this.$store.state.retCarLand
+                    this.$store.state.takeCarBrand = this.$store.state.retCarBrand
+                    this.$store.state.takeCarGuid = this.$store.state.retCarGuid
+                    this.$store.state.takeCarCountry = this.$store.state.retCarCountry
+                    this.$store.state.takeCarCoor = this.$store.state.retCarCoor
                 }
             }
             this.searchData = []
-            this.$router.push({path: '/'})
+            this.$store.state.isShowChoiceCity = false
+            this.$store.state.isShowChoiceLand = false
+            // if (this.$store.state.isGoHome) {
+            //     this.$router.push({path: '/'})
+            // }else{
+            //     if (this.$route.path === '/choiceCity') {
+            //         this.$router.go(-1)
+            //     }else{
+            //         this.$router.go(-2)
+            //     }
+            //     // this.$router.push({
+            //     //     path: this.$store.state.redirectPath,
+            //     //     query: this.$store.state.redirectQuery
+            //     // })
+            // }
         },
     },
     watch: {
@@ -138,16 +177,16 @@ export default {
             this.searchValue = pubMethod.filterCode(this.searchValue)
             let val = this.searchValue
             this.notFindLandMark = false
-            if (this.searchValue == "") {
-                this.isShowSearchList = false
-                this.searchData = []
-                this.$store.state.isSearching = false
-            }
             setTimeout(() => {
                 if (this.searchValue === val && this.searchValue != "") {
                     this.$store.state.isSearching = true
+                    this.isShowSearchList = true
                     this.getSearchLandMark()
                     this.$refs.searchInput.blur()
+                }else if (this.searchValue == "") {
+                    this.isShowSearchList = false
+                    this.searchData = []
+                    this.$store.state.isSearching = false
                 }
             }, 1000)
         } 

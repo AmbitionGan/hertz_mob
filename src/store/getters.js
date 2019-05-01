@@ -16,14 +16,10 @@ const index = {
     getTakeCarDate (state) {
         state.calendar.forEach(ele => {
             if (ele.istaday) {
-                [state.takeCarYear, state.takeCarMonth, state.takeCarDay] = pubMethod.formatDateString(ele.daystring)
-                state.takeCarMonthCn = ele.month_cn
-                state.takeCarDays = ele.month_days
-                state.takeCarweekCn = ele.week_cn
-                state.takeCarHour = '10'
-                state.takeCarMin = '00'
-                state.takeCarPeriod = 'AM'
-                state.timeSpans = '7'
+                [state.todayYear, state.todayMonth, state.todayDay] = pubMethod.formatDateString(ele.daystring)
+                state.todayWeekCn = ele.week_cn
+                state.todayMonthCn = ele.month_cn
+                state.todayDays = ele.month_days
             }
         })
     },
@@ -53,7 +49,7 @@ const index = {
         state.takeCarPeriod = 'AM'
         state.timeSpans = '7'
     },
-    // 第一次进入设置默认取车日期
+    // 第一次进入设置默认还车日期
     setDefaultRetCarDate (state) {
         if (Number(state.takeCarDay) + 7 - state.takeCarDays > 0) {
             if (Number(state.takeCarMonth) + 1 > 12) {  // 超过12个月
@@ -61,14 +57,14 @@ const index = {
                 state.retCarMonth = state.takeCarMonth - 12
             }else{
                 state.retCarYear = state.takeCarYear
-                state.retCarMonth = Number(state.takeCarMonth) + 1
+                state.retCarMonth = Number(state.takeCarMonth) + 1 < 10 ? '0' + (Number(state.takeCarMonth) + 1) : Number(state.takeCarMonth) + 1
             }
-            state.retCarDay = Number(state.takeCarDay) + 7 - state.takeCarDays
+            state.retCarDay = Number(state.takeCarDay) + 7 - state.takeCarDays < 10 ? '0' + (Number(state.takeCarDay) + 7 - state.takeCarDays) : Number(state.takeCarDay) + 7 - state.takeCarDays
             state.retCarMonthCn = pubMethod.monthNumberChangeCn(state.retCarMonth)
         }else{
             state.retCarYear = state.takeCarYear
             state.retCarMonth = state.takeCarMonth
-            state.retCarDay = Number(state.takeCarDay) + 7
+            state.retCarDay = Number(state.takeCarDay) + 7 < 10 ? '0' + (Number(state.takeCarDay) + 7) : Number(state.takeCarDay) + 7
             state.retCarMonthCn = state.takeCarMonthCn
         }
         state.retCarweekCn = state.takeCarweekCn

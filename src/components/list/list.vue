@@ -1,29 +1,7 @@
 <template>
   <div class="index-list-body">
     <div class="list">
-      <div class="personal_header">
-        <img src="../../../static/images/goBack-white.png" class="goBack">
-        <div class="detailPage-address-bottom index-list-body-bottom">
-          <div>
-            <p>洛杉矶机场</p>
-            <p>10月31日 周三 <br> 10:00 AM</p>
-          </div>
-          <div>
-            <p class="number-day">7天</p>
-
-            <p>
-              <img src="../../../static/images/jiantou.png" alt="" class="jiantou">
-            </p>
-          </div>
-          <div>
-            <p>洛杉矶机场</p>
-            <p>11月07日 周六 <br>4:00 PM</p>
-          </div>
-          <p class="change-city">
-            <img src="../../../static/images/change.png" alt="">
-          </p>
-        </div>
-      </div>
+      <modify-address></modify-address>
       <div class="index-list-sort">
         <div class="index-list-sort-left">
           <p>综合排序</p>
@@ -164,9 +142,11 @@
 
 <script>
   import apiRequest from '@/api/index'
+  import ModifyAddress from "../common/modifyAddress";
 
   export default {
     name: 'list',
+    components: {ModifyAddress},
     data() {
       return {
         initState: true,
@@ -188,12 +168,80 @@
         },
         extendSelect: [],
         //日租，整租
-        changeOption: 0
+        changeOption: 0,
+        takeTransLat:0,
+        takeTransLng:0,
+        retTransLat:0,
+        retTransLng:0
       }
     },
     mounted() {
+      var that = this;
       var param = new this.urlSearch();
-      apiRequest.vehicle({
+      console.log(param.take.split(","));
+      param.take.split(",").forEach(function(value, index, array){
+        switch (index) {
+          case 0:
+            that.$store.state.takeCarLand = decodeURIComponent(decodeURIComponent(value));
+            break;
+          case 1:
+            that.takeTransLat = value;
+            break;
+          case 2:
+            that.takeTransLng = value;
+            break;
+        }
+      });
+      param.ret.split(",").forEach(function(value, index, array){
+        switch (index) {
+          case 0:
+            that.$store.state.retCarLand = decodeURIComponent(decodeURIComponent(value));
+            break;
+          case 1:
+            that.retTransLat = value;
+            break;
+          case 2:
+            that.retTransLng = value;
+            break;
+        }
+      });
+
+      var getDate = decodeURIComponent(param.pd).split(" ")[0];
+      var getTime = decodeURIComponent(param.pd).split(" ")[1];
+      this.$store.state.takeCarYear = getDate.split("-")[0];
+      this.$store.state.takeCarMonth = Number(getDate.split("-")[1]);
+      this.$store.state.takeCarMonthCn = pubMethod.monthNumberChangeCn(Number(getDate.split("-")[1]));
+      this.$store.state.takeCarDay = getDate.split("-")[2]
+      this.$store.state.takeCarweekCn = pubMethod.weekGetDayChangeCn(new Date(getDate).getDay());
+      this.$store.state.takeCarHour = getTime.match(/\d*\d\S\d*\d/g)[0].split(":")[0];
+      this.$store.state.takeCarMin = getTime.match(/\d*\d:\d*\d/g)[0].split(":")[1];
+      this.$store.state.takeCarPeriod = getTime.match(/[A-Z][A-Z]/g)[0];
+      var getRetDate = decodeURIComponent(param.rd).split(" ")[0];
+      var getRetTime = decodeURIComponent(param.rd).split(" ")[1];
+      this.$store.state.retCarYear = getRetDate.split("-")[0];
+      this.$store.state.retCarMonth = Number(getRetDate.split("-")[1])
+      this.$store.state.retCarMonthCn = pubMethod.monthNumberChangeCn(Number(getRetDate.split("-")[1]));
+      this.$store.state.retCarDay = getRetDate.split("-")[2]
+      this.$store.state.retCarweekCn = pubMethod.weekGetDayChangeCn(new Date(getRetDate).getDay());
+      this.$store.state.retCarHour = getRetTime.match(/\d*\d\S\d*\d/g)[0].split(":")[0];
+      this.$store.state.retCarMin = getRetTime.match(/\d*\d:\d*\d/g)[0].split(":")[1];
+      this.$store.state.retCarPeriod = getRetTime.match(/[A-Z][A-Z]/g)[0];
+
+      this.$store.state.timeSpans = param.lease;
+
+      this.$store.state.takeCarCountry = param.country.split(",")[0];
+      this.$store.state.takeCarBrand = param.brand.split(",")[0];
+      this.$store.state.takeCarGuid = param.guid.split(",")[0];
+      this.$store.state.takeCarCoor = param.take.split(",")[1]+","+param.take.split(",")[2];
+
+      this.$store.state.takeCarCountry = param.country.split(",")[1];
+      this.$store.state.takeCarBrand = param.brand.split(",")[1];
+      this.$store.state.takeCarGuid = param.guid.split(",")[1];
+      this.$store.state.takeCarCoor = param.ret.split(",")[1]+","+param.take.split(",")[2];
+
+      this.$store.state.isCalendarLoaded = true;
+
+      var getObj = {
         pickuplocation: param.pl,
         pickupdatetime: decodeURIComponent(param.pd),
         returnlocation: param.rl,
@@ -201,7 +249,19 @@
         country: param.country,
         brand: param.brand,
         guid: param.guid
-      }).then(res => {
+      }
+
+      var getPl,getRl;
+      if(param.pl == "" || param.pl == null){
+        delete getObj.pickuplocation;
+      }
+      if(param.rl == "" || param.rl == null){
+        delete getObj.returnlocation;
+      }
+      delete getObj.country
+      delete getObj.brand
+
+      apiRequest.vehicle(getObj).then(res => {
         var data = res.Result;
         for (var i = 0; i < data.length; i++) {
           data[i].toggleState = false;
@@ -682,7 +742,7 @@
         this.changeOption = oSelect.value;
       },
       openDetail:function(guid){
-        window.location.href= './details/?guid='+guid
+        window.location.href= './details/?guid='+guid+'&take='+this.takeTransLat+','+this.takeTransLng+'&ret='+this.retTransLat+","+this.retTransLng
       },
       turnLogo:function(name){
         console.log(name);

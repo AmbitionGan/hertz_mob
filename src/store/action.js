@@ -23,6 +23,10 @@ const common = {
 
 // 首页方法
 const index = {
+    async getAreaCode () {
+        let data = indexApi.getLandMark(null)
+        indexApi.getAreaCode(null)
+    },
     // 如果第一次进入
     async getCalendar ({commit, state}, params) {
         if (state.takeCarYear === '' && state.takeCarMonth === '' && state.takeCarDay == '') {

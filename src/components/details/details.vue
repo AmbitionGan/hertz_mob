@@ -2,23 +2,7 @@
   <div class="detailPage-body" v-loading="loading">
     <div id="mhz">
       <!-- header -->
-      <div class="personal_header">
-        <img src="../../../static/images/goBack-white.png" class="goBack">
-        <div class="detailPage-address-bottom detailPage-address-bottom-header">
-          <div>
-            <p>{{$store.state.picAddress}}</p>
-            <p>{{$store.state.pickupDate}}&nbsp;{{$store.state.pickupdayofweek}}<br>{{$store.state.pickupTime}}</p>
-          </div>
-          <div>
-            <p>{{$store.state.dayspan}}天</p>
-            <p><img src="../../../static/images/jiantou.png" class="jiantou"></p>
-          </div>
-          <div>
-            <p>{{$store.state.reAddress}}</p>
-            <p>{{$store.state.reDate}}&nbsp;{{$store.state.returndayofweek}}<br>{{$store.state.reTime}}</p>
-          </div>
-        </div>
-      </div>
+      <get-car-header></get-car-header>
       <div class="detailPage">
         <car-massage></car-massage>
         <!--套餐部分-->
@@ -31,7 +15,7 @@
                 <p class="last-child-p"><span><span v-html="$store.state.insureList[index].content2"></span></span></p>
                 <a href="javascript:void(0)" @click="showInsure"></a>
               </div>
-              <p class="setMeal-ul-liRight" v-show="showList[index].state != 'active' && showList[index].state != 'on'"><span class="pPrice-price">+USD <i>{{showList[index].price.toFixed(2)}}</i></span> <span class="pPrice-data">元/天</span></p>
+              <p class="setMeal-ul-liRight" v-show="showList[index].state != 'active' && showList[index].state != 'on'"><span class="pPrice-price">+{{$store.state.unitMoney}} <i>{{showList[index].price.toFixed(2)}}</i></span> <span class="pPrice-data">元/天</span></p>
               <img src="../../../static/images/activeBg.png" alt="" class="choose-li" v-show="showList[index].state == 'on'">
             </li>
           </ul>
@@ -76,13 +60,28 @@
             </li>
             <li v-show="childState">
               <dl>
-                <span>婴儿座椅</span><el-input-number size="mini" @change="initRate" v-model="$store.state.equiChild1" :step="1" step-strictly></el-input-number>
+                <span>婴儿座椅</span>
+                <div class="inputNumber">
+                  <a href="javascript:void(0)" class="inputMenu reduce" @click="reduce('child1')">-</a>
+                  <a href="javascript:void(0)" class="childNumber">{{$store.state.equiChild1}}</a>
+                  <a href="javascript:void(0)" class="inputMenu add" @click="add('child1')">+</a>
+                </div>
               </dl>
               <dl>
-                <span>幼儿座椅</span><el-input-number size="mini" @change="initRate" v-model="$store.state.equiChild2" :step="1" step-strictly></el-input-number>
+                <span>幼儿座椅</span>
+                <div class="inputNumber">
+                  <a href="javascript:void(0)" class="inputMenu reduce" @click="reduce('child2')">-</a>
+                  <a href="javascript:void(0)" class="childNumber">{{$store.state.equiChild2}}</a>
+                  <a href="javascript:void(0)" class="inputMenu add" @click="add('child2')">+</a>
+                </div>
               </dl>
               <dl>
-                <span>儿童座椅</span><el-input-number size="mini" @change="initRate" v-model="$store.state. equiChild3" :step="1" step-strictly></el-input-number>
+                <span>儿童座椅</span>
+                <div class="inputNumber">
+                  <a href="javascript:void(0)" class="inputMenu reduce" @click="reduce('child3')">-</a>
+                  <a href="javascript:void(0)" class="childNumber">{{$store.state.equiChild3}}</a>
+                  <a href="javascript:void(0)" class="inputMenu add" @click="add('child3')">+</a>
+                </div>
               </dl>
             </li>
             <li><span>支付方式</span>
@@ -96,11 +95,11 @@
         <!--驾照要求 订单条款-->
         <div class="driversTranslator requirements">
           <ul class="driversTranslator_ul" role="tablist" >
-            <li role="presentation" class="active">
-              <a href="#available" aria-controls="available" role="tab" data-toggle="tab" >驾照要求</a>
+            <li role="presentation" :class="positionTab == 0?'active':''">
+              <a href="javascript:void(0)" aria-controls="available" role="tab" data-toggle="tab"  @click="showPosition('available')">驾照要求</a>
             </li>
-            <li role="presentation">
-              <a href="#unavailable" aria-controls="unavailable" role="tab" data-toggle="tab">订单条款</a>
+            <li role="presentation" :class="positionTab == 1?'active':''">
+              <a href="javascript:void(0)" aria-controls="unavailable" role="tab" data-toggle="tab" @click="showPosition('unavailable')">订单条款</a>
             </li>
           </ul>
           <div class="tab-content">
@@ -148,6 +147,7 @@
   import 'element-ui/lib/theme-chalk/index.css';
   import FooterPrice from "../common/footer_price";
   import CarMassage from "../common/carDetails";
+  import GetCarHeader from "../common/getCarHeader";
 
   Vue.use(ElementUI);
 
@@ -155,7 +155,7 @@
 
   export default {
     name: 'carDetails',
-    components: {CarMassage, FooterPrice},
+    components: {GetCarHeader, CarMassage, FooterPrice},
     data() {
       return {
         value2:true,
@@ -224,11 +224,19 @@
         resultGroup:[],
         loading:false,
         dialogInsure:false,
-        insList:[]
+        insList:[],
+        mapShow:false,
+        positionTab:0
       }
     },
     mounted() {
       this.init();
+
+      window.onscroll = function () {
+        if(window.body.scrollTop < document.getElementById("unavailable").offsetTop){
+
+        }
+      }
     },
     methods: {
       //获取url
@@ -255,8 +263,8 @@
         var t=arr[1];
         var tarr = t.split('.000');
         var marr = tarr[0].split(':');
-
-        var dd = parseInt(darr[0])+"年"+parseInt(darr[1])+"月"+parseInt(darr[2])+"日"
+        //parseInt(darr[0])+"年"+
+        var dd = parseInt(darr[1])+"月"+parseInt(darr[2])+"日"
         return dd;
       },
       myTime:function(date){
@@ -283,12 +291,34 @@
        */
       init:function(){
         var that = this;
+        this.$loadingToast.show();
         let param = new this.urlSearch();
+        param.take.split(",").forEach(function(value, index, array){
+          switch (index) {
+            case 0:
+              that.$store.state.takeTransLat = value;
+              break;
+            case 1:
+              that.$store.state.takeTransLng = value;
+              break;
+          }
+        });
+        param.ret.split(",").forEach(function(value, index, array){
+          switch (index) {
+            case 0:
+              that.$store.state.retTransLat = value;
+              break;
+            case 1:
+              that.$store.state.retTransLng = value;
+              break;
+          }
+        });
         apiRequest.getVehicleDetails({
           guid: param.guid
         }).then(res => {
           var data= res.Result;
-          this.carDetails = data;
+          this.$loadingToast.close();
+          this.$store.state.carDetails = data;
           this.$store.state.image_path = data.image_path;
           this.$store.state.short_description = data.short_description
           this.$store.state.num_adult_passengers = data.num_adult_passengers
@@ -298,9 +328,6 @@
           this.$store.state.pickupdayofweek = data.pickupdayofweek
           this.$store.state.dayspan = data.dayspan
           this.$store.state.returndayofweek = data.returndayofweek
-
-
-
           this.$store.state.picAddress = data.pickuplocation_details.address;
           this.$store.state.reAddress = data.returnlocation_details.address;
           this.$store.state.detailBrands = this.showLogoSrc(data.pickuplocation_details.brands);
@@ -308,9 +335,11 @@
           this.$store.state.pickupTime = this.myTime(data.pickupdatetime);
           this.$store.state.reDate = this.myDate(data.returndatetime);
           this.$store.state.reTime = this.myTime(data.returndatetime);
+          this.$store.state.unitMoney = data.currencycode;
           this.paramBrans = data.pickuplocation_details.brands;
           this.paramCountry = data.pickuplocation_details.country;
           this.paramState = data.pickuplocation_details.state;
+
           this.detailMoney(res);
           this.requestIns();
           this.resClause(res);
@@ -464,55 +493,9 @@
             code = that.unique22(code);
           })
         });
-        switch(nIndex){
-          case 0:
-            this.showList = [
-              {
-                state:"on",
-                price:0
-              },
-              {
-                state:"",
-                price:eval(that.$store.state.insureList[1].price - that.$store.state.insureList[0].price)
-              },
-              {
-                state:"",
-                price:eval(that.$store.state.insureList[2].price - that.$store.state.insureList[0].price)
-              }
-            ]
-            break;
-          case 1:
-            this.showList = [
-              {
-                state:"active",
-                price:0
-              },
-              {
-                state:"on",
-                price:0,
-              },
-              {
-                state:"",
-                price:eval(that.$store.state.insureList[2].price - that.$store.state.insureList[1].price)
-              }
-            ]
-            break;
-          case 2:
-            this.showList = [
-              {
-                state:"active",
-                price:0
-              },
-              {
-                state:"active",
-                price:0,
-              },
-              {
-                state:"on",
-                price:0
-              }
-            ]
-        }
+
+        this.showBaseInsure(nIndex);
+
         if(arr.length == 0){
           that.serverState = false;
           this.server = null;
@@ -867,10 +850,51 @@
         // }
 
       },
+      add:function(param){
+        var childNumber = Number(this.$store.state.equiChild1) + Number(this.$store.state.equiChild2) + Number(this.$store.state.equiChild3);
+        if(childNumber >= 3){
+          this.errorState("座椅数量不能大于3个！")
+          return false;
+        }else{
+          switch (param) {
+            case 'child1':
+              this.$store.state.equiChild1++;
+              break;
+            case 'child2':
+              this.$store.state.equiChild2++;
+              break;
+            case 'child3':
+              this.$store.state.equiChild3++;
+              break;
+          }
+          this.initRate();
+        }
+      },
+      reduce:function(param){
+        var childNumber = Number(this.$store.state.equiChild1) + Number(this.$store.state.equiChild2) + Number(this.$store.state.equiChild3);
+        if(childNumber <= 0){
+          this.errorState("座椅数量不能小于0个！")
+          return false;
+        }else{
+          switch (param) {
+            case 'child1':
+              this.$store.state.equiChild1--;
+              break;
+            case 'child2':
+              this.$store.state.equiChild2--;
+              break;
+            case 'child3':
+              this.$store.state.equiChild3--;
+              break;
+          }
+          this.initRate();
+        }
+      },
       /**
        * 额外设备接口
        */
       initRate:function(){
+
         this.$loadingToast.show();
         var nowGuid = (this.$store.state.payState == 'online')?this.insureGuid:this.insureArriveGuid;
         apiRequest.getrate({
@@ -993,6 +1017,79 @@
       },
       showInsure:function(){
         this.dialogInsure = true;
+      },
+      showBaseInsure:function(nIndex){
+        var that = this;
+        that.showList = [];
+        if(that.$store.state.insureList.length == 1){
+          that.showList.push({
+            state:'on',
+            price:0
+          })
+        }else{
+          that.$store.state.insureList.forEach(function(value, index, array){
+            if(nIndex == 0) {
+              if(index == 0){
+                that.showList.push({
+                  state:'on',
+                  price:0
+                })
+              }else{
+                that.showList.push({
+                  state:'',
+                  price:eval(that.$store.state.insureList[index].price - that.$store.state.insureList[index-1].price),
+                })
+              }
+            }else{
+              if(nIndex == index){
+                that.showList.push({
+                  state:'on',
+                  price:eval(that.$store.state.insureList[nIndex].price - that.$store.state.insureList[nIndex-1].price),
+                })
+              }else if(nIndex > index){
+                that.showList.push({
+                  state:'active',
+                  price:0,
+                })
+              }else if(nIndex < index){
+                that.showList.push({
+                  state:'',
+                  price:eval(that.$store.state.insureList[nIndex].price - that.$store.state.insureList[nIndex-1].price),
+                })
+              }
+            }
+          })
+        }
+      },
+      showPosition:function(param){
+        // switch (param) {
+        //   case 'available':
+        //     this.positionTab = 0;
+        //     break;
+        //   case 'unavailable':
+        //     this.positionTab = 1;
+        //     break;
+        // }
+        var mTop = document.getElementById(param).offsetTop;
+        this.scrollTopFun(mTop,200);
+      },
+      scrollTopFun:function(number,time) {
+        if (!time) {
+          document.body.scrollTop = document.documentElement.scrollTop = number;
+          return number;
+        }
+        const spacingTime = 20; // 设置循环的间隔时间  值越小消耗性能越高
+        let spacingInex = time / spacingTime; // 计算循环的次数
+        let nowTop = document.body.scrollTop + document.documentElement.scrollTop; // 获取当前滚动条位置
+        let everTop = (number - nowTop) / spacingInex; // 计算每次滑动的距离
+        let scrollTimer = setInterval(() => {
+          if (spacingInex > 0) {
+            spacingInex--;
+            this.scrollTopFun(nowTop += everTop);
+          } else {
+            clearInterval(scrollTimer); // 清除计时器
+          }
+        }, spacingTime);
       }
     },
     computed: {}
@@ -1067,8 +1164,11 @@
     margin-bottom: 5px;
   }
   .additionalEquipment li dl{
+    overflow: hidden;
     padding:0 8px;
-    margin: 0 -5px;
+    margin: 0 auto;
+    margin-bottom: 5px;
+    width:96%;
   }
   .additionalEquipment li .el-input-number__decrease,.additionalEquipment li .el-input-number__increase{
     background: rgb(255, 204, 0);
@@ -1149,5 +1249,68 @@
   .dialogInsureOuter .el-dialog__headerbtn{
     top:4px;
     right:10px;
+  }
+  .additionalEquipment li{
+
+  }
+  .inputNumber{
+    position: relative;
+    height:30px;
+  }
+  .inputMenu{
+    display: block;
+    width:28px;
+    height:28px;
+    line-height: 24px;
+    text-align: center;
+    background: #ffcc00;
+    color: #000;
+    border-radius: 4px 0 0 4px;
+    border-right: 1px solid #DCDFE6;
+    float:left;
+    position: absolute;
+  }
+  .inputMenu.reduce{
+    border-radius: 4px 0 0 4px;
+    border: 1px solid #DCDFE6;
+    left:0;
+    top:0;
+  }
+  .inputMenu.add{
+    border-radius: 0 4px 4px 0;
+    border: 1px solid #DCDFE6;
+    right:0;
+    top:0;
+  }
+  .childNumber{
+    display: block;
+    height: 28px;
+    line-height: 24px;
+    margin:0 auto;
+    width:calc(~"100% - 20px");
+    border-top:1px solid #DCDFE6;
+    border-bottom:1px solid #DCDFE6;
+    box-sizing: border-box;
+    text-align: center  ;
+  }
+  .detailPage-address-bottom{
+    &>div{
+      flex : 2;
+      &:nth-child(2){
+        text-align: center;
+        flex : 1;
+        p{
+          height:auto!important;
+        }
+      }
+      &>p:first-child{
+        line-height: 1.4em;
+        height:2.8em;
+        overflow: hidden;
+      }
+      &>p:last-child{
+        white-space: nowrap;
+      }
+    }
   }
 </style>

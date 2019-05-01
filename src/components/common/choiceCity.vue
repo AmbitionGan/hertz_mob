@@ -9,7 +9,7 @@
                 <input type="text" placeholder="输入城市/机场/火车站/商圈" autocomplete="off">
             </div>
         </div> -->
-        <landMarkSearch />
+        <landMarkSearch ref="landMarkSearch"/>
         <!-- 列表区域 -->
         <div class="listContainer clear" v-show="!$store.state.isSearching">
             <div class="hot left">
@@ -109,30 +109,34 @@ export default {
         }
     },
     mounted () {
-        // 获取地标
-        this.$loadingToast.show()
-        indexApi.getLandMark(null)
-        .then(res => {
-            this.hotCountry = res.Result
-            this.choiceHotClassity(0)
-        })
-        .catch(err => {
-            alert('地标请求错误！')
-        })
 
-        // 字母移动
-        this.alphabetMove()
-
-        // 计算列表高度
-        var listContainer = document.querySelector('.listContainer');
-        listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
-
-        // 谷歌地图初始化
-        this.$store.state.mapData = []
-        this.$store.state.isClearMap = false
-        this.$store.state.isShowMap = false
     },
     methods: {
+        /**
+         * 初始化选择城市
+         */
+        init () {
+            // 获取地标
+            this.$loadingToast.show()
+            indexApi.getLandMark(null)
+            .then(res => {
+                this.hotCountry = res.Result
+                this.choiceHotClassity(0)
+            })
+            .catch(err => {
+                alert('地标请求错误！')
+            })
+
+            // 字母移动
+            this.alphabetMove()
+
+            // 计算列表高度
+            var listContainer = document.querySelector('.listContainer');
+            listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
+
+            // 初始化搜索
+            this.initSearch()
+        },
         /**
          * 选择热门国家分类 请求所有城市
          */
@@ -157,7 +161,9 @@ export default {
          */
         chooseCity (index, i) {
             let tmpCityData = this.hotCountryAllCity[index].itemlist[i]
-                this.$router.push({path: '/choiceLandMark', query:{'isTakeCar': !this.$route.query.isTakeCar ? 0 : 1, 'cityid': tmpCityData.cityid}})            
+            this.$store.state.choiceCityId = tmpCityData.cityid
+            this.$emit('initChoiceLand', true)
+            // this.$router.push({path: '/choiceLandMark', query:{'isTakeCar': !this.$route.query.isTakeCar ? 0 : 1, 'cityid': tmpCityData.cityid}})            
         },
 
         /**
@@ -196,6 +202,13 @@ export default {
                 }
             })
         },
+
+        /**
+         * 初始化搜索
+         */
+        initSearch () {
+            this.$refs.landMarkSearch.init()
+        },
     }
 }
 </script>
@@ -218,6 +231,10 @@ export default {
 .choiceCity {
     height: 100vh;
     background: #fff;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
 }
 /* 列表区域 */
 .listContainer {
@@ -228,6 +245,8 @@ export default {
     box-sizing: content-box;
     background: #fff;
     position: fixed;
+    left: 0;
+    top: 0;
     z-index: 1;
     .hot {
         width: 1.76rem;

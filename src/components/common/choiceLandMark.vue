@@ -9,7 +9,7 @@
                 <input type="text" placeholder="输入城市/机场/火车站/商圈" autocomplete="off">
             </div>
         </div> -->
-        <landMarkSearch />
+        <landMarkSearch ref="landMarkSearch"/>
         <!-- 列表区域 -->
 		<div class="listContainer clear" v-show="!$store.state.isSearching" ref="listContainer">
 			<div class="landMarkClassify left">
@@ -68,20 +68,29 @@ export default {
 		}
 	},
 	mounted () {
-        this.getLandMark()
-        
-        // 计算列表高度
-        var listContainer = document.querySelector('.listContainer');
-        listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
-	},
+    },
 	methods: {
+        /**
+         * 初始化地标选择
+         */
+        init () {
+            this.getLandMark()
+        
+            // 计算列表高度
+            var listContainer = document.querySelector('.listContainer');
+            listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
+
+            // 初始化搜索
+            this.initSearch()
+        },
+
 		/**
 		 * 获取地标
 		 */
 		getLandMark () {
             this.$loadingToast.show()
             this.isLoading = true
-			indexApi.getLandMark({type: 5, cityid: this.$route.query.cityid})
+			indexApi.getLandMark({type: 5, cityid: this.$store.state.choiceCityId})
 			.then(res => {
                 this.$loadingToast.close()
                 this.isLoading = false
@@ -148,13 +157,13 @@ export default {
          */
         chooseLand (index, i) {
             let tmpCityData = this.landMarkClassify[index].list[i]
-            if (this.$route.query.isTakeCar == 1) {
+            if (this.$store.state.isTakeCar) {
                 // 选择取车城市的情况下
                 this.$store.state.takeCarLand = tmpCityData.placename
                 this.$store.state.takeCarBrand = tmpCityData.brands
                 this.$store.state.takeCarGuid = tmpCityData.guid
                 this.$store.state.takeCarCountry = tmpCityData.countrycode
-
+                this.$store.state.takeCarCoor = tmpCityData.latitude + ',' + tmpCityData.longitude
                 // 如果还车地标等于空
 				if (this.$store.state.retCarLand === '') {
                     // 还车地标 = 取车地标
@@ -162,15 +171,15 @@ export default {
                     this.$store.state.retCarBrand = this.$store.state.takeCarBrand
                     this.$store.state.retCarGuid = this.$store.state.takeCarGuid
                     this.$store.state.retCarCountry = this.$store.state.takeCarCountry
+                    this.$store.state.retCarCoor = this.$store.state.takeCarCoor
                 }
-
-                this.$router.push({path: '/'})
             }else{
                 // 选择换车城市的情况下
                 this.$store.state.retCarLand = tmpCityData.placename
                 this.$store.state.retCarBrand = tmpCityData.brands
                 this.$store.state.retCarGuid = tmpCityData.guid
                 this.$store.state.retCarCountry = tmpCityData.countrycode
+                this.$store.state.retCarCoor = tmpCityData.latitude + ',' + tmpCityData.longitude
 
                 // 如果取车地标等于空
 				if (this.$store.state.takeCarLand === '') {
@@ -179,9 +188,19 @@ export default {
                     this.$store.state.takeCarBrand = this.$store.state.retCarBrand
                     this.$store.state.takeCarGuid = this.$store.state.retCarGuid
                     this.$store.state.takeCarCountry = this.$store.state.retCarCountry
+                    this.$store.state.takeCarCoor = this.$store.state.retCarCoor
                 }
-                this.$router.push({path: '/'})
             }
+            // if (this.$store.state.isGoHome) {
+            //     this.$router.push({path: '/'})
+            // }else{
+            //     this.$router.go(-2)
+            //     // this.$router.push({
+            //     //     path: this.$store.state.redirectPath,
+            //     //     query: this.$store.state.redirectQuery
+            //     // })
+            // }
+            this.$store.state.isShowChoiceLand = false
 		},
         
         /**
@@ -219,7 +238,14 @@ export default {
                     }
                 }
             }
-        }
+        },
+
+        /**
+         * 初始化搜索
+         */
+        initSearch () {
+            this.$refs.landMarkSearch.init()
+        },
 	}
 }
 
@@ -242,6 +268,10 @@ export default {
 .choiceLandMark {
     height: 100vh;
     background: #fff;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
 }
 /* 搜索 */
 .search {
@@ -278,6 +308,8 @@ export default {
     box-sizing: content-box;
     background: #fff;
     position: fixed;
+    left: 0;
+    top: 0;
     z-index: 1;
     /* 左边分类 */
     .landMarkClassify {

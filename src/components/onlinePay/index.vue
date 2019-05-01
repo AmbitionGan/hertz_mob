@@ -8,14 +8,8 @@
             <div class="priceBox">
                 <div class="price clear">
                     <h4 class="left">支付订单费用</h4>
-                    <span class="right">
-                        RMB
-                        <b>3200</b>
-                    </span>
-                    <p class="clear">
-                        价格浮动频繁，请在
-                        <span>44分59秒</span>内完成支付，逾期订单将自动取消
-                    </p>
+                    <span class="right">RMB<b>3200</b></span>
+                    <p class="clear">价格浮动频繁，请在<span>44分59秒</span>内完成支付，逾期订单将自动取消</p>
                 </div>
                 <div class="showDetail">
                     <span>查看订单详情</span>
@@ -25,17 +19,23 @@
             <div class="choosePayType">
                 <p>请选择支付方式</p>
                 <ul>
-                    <li @click="getPay('alipay')">
-                        <img src="@/assets/images/alipay.png" alt>
-                        支付宝
+                    <li>
+                        <router-link to="/">
+                            <img src="@/assets/images/alipay.png" alt="">
+                            支付宝
+                        </router-link>
                     </li>
-                    <li @click="getPay('fast')">
-                        <img src="@/assets/images/bankpay.png" alt>
-                        银联云闪付
+                    <li>
+                        <router-link to="/">
+                            <img src="@/assets/images/bankpay.png" alt="">
+                            银联云闪付
+                        </router-link>
                     </li>
-                    <li @click="getPay('union')">
-                        <img src="@/assets/images/bankpay.png" alt>
-                        银联支付
+                    <li>
+                        <router-link to="/">
+                            <img src="@/assets/images/bankpay.png" alt="">
+                            银联支付
+                        </router-link>
                     </li>
                 </ul>
             </div>
@@ -72,15 +72,17 @@
 </template>
 
 <script>
-import choiceCityComHead from "../common/choiceCityComHead";
-import indexApi from "@/api/index";
+import choiceCityComHead from '../common/choiceCityComHead'
+import indexApi from '@/api/index'
+import {common} from '@/assets/mixin/common'
 
 export default {
-    name: "onlinePay",
+    name: 'onlinePay',
     components: {
         choiceCityComHead
     },
-    data() {
+    mixins: [common],
+    data () {
         return {
             // 提醒弹窗
             isShowPromptLayer: false,
@@ -95,12 +97,12 @@ export default {
             number: ''
         };
     },
-    mounted() {
+    mounted () {
         // this.getPay()
     },
     methods: {
         init () {
-            
+
         },
 
         /**
@@ -113,20 +115,8 @@ export default {
                 href: "",
                 idnumber: "320125199604170018",
                 name: "甘志成",
+                pmode: "306",
                 random: Math.random().toString(36).substr(8)
-            };
-            switch (str) {
-                case 'alipay':
-                    params.pmode = 306
-                    break
-                case 'fast':
-                    params.pmode = 423
-                    break
-                case 'union':
-                    params.pmode = 126
-                    break
-                default:
-                    break
             }
             this.$loadingToast.show()
             indexApi
@@ -147,7 +137,7 @@ export default {
                     this.messageLayer("请求失败，请重试", 0)
                 });
         },
-        
+
         /**
          * 身份验证
          */
@@ -160,35 +150,10 @@ export default {
             let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
             if (!reg.test(this.number)) {
                 this.messageLayer('身份证号码错误')
-                return 
+                return
             }
             this.isShowIdentityLayer = false
             this.isShowPromptLayer = true
-        },
-
-        /**
-         * el 弹窗
-         * @param {String} msg 弹窗信息
-         * @param {Number} type 弹窗类别
-         */
-        messageLayer (msg, type) {
-            let config = {
-                message: msg
-            }
-            switch (type) {
-                case 0:
-                    config.type = 'error'
-                    break
-                case 1:
-                    config.type = 'success'
-                    break
-                case 2:
-                    config.type = 'warning'
-                    break
-                default:
-                    break
-            }
-            this.$message(config)
         },
     },
     watch: {
@@ -197,26 +162,22 @@ export default {
             this.name = pubMethod.filterCode(this.name)
         }
     }
-};
+}
 </script>
 
 <style lang="less" scoped>
-.onlinePay {
-    height: 100vh;
-    background: #fff;
-}
 .onlinePayContainer {
     .price {
         padding: 0.46rem 0.3rem;
         background: #57585a;
         border-bottom: 1px solid #7c7d7f;
         h4 {
-            font-size: 0.36rem;
-            line-height: 0.52rem;
+            font-size: .36rem;
+            line-height: .52rem;
             color: #fff;
         }
         > span {
-            color: #ffcc00;
+            color: #FFCC00;
             > b {
                 margin-left: 5px;
                 font-size: 0.48rem;
@@ -226,47 +187,49 @@ export default {
         > p {
             clear: both;
             color: #fff;
-            padding-top: 0.28rem;
+            padding-top: .28rem;
             span {
-                color: #ff0000;
+                color: #FF0000;
             }
         }
     }
     .showDetail {
-        padding: 0.21rem 0.45rem;
-        background: #57585a;
+        padding: .21rem .45rem;
+        background: #57585A;
         span {
-            color: #ffcc00;
+            color: #FFCC00;
             text-decoration: underline;
         }
     }
     .choosePayType {
         > p {
-            background: #f3f3f5;
-            color: #969ca3;
-            padding: 0 0.4rem;
-            line-height: 0.9rem;
+            background: #F3F3F5;
+            color: #969CA3;
+            padding: 0 .4rem;
+            line-height: .9rem;
         }
         li {
-            display: block;
-            font-size: 0.3rem;
-            padding-left: 1.97rem;
-            line-height: 1.5rem;
-            border-bottom: 1px solid #e9e9e9;
-            position: relative;
-            img {
-                width: 1.37rem;
-                height: 0.75rem;
-                position: absolute;
-                left: 0.19rem;
-                top: 50%;
-                transform: translateY(-50%);
+            > a{
+                display: block;
+                font-size: .3rem;
+                padding-left: 1.97rem;
+                line-height: 1.5rem;
+                border-bottom: 1px solid #E9E9E9;
+                position: relative;
+                img {
+                    width: 1.37rem;
+                    height: .75rem;
+                    position: absolute;
+                    left: .19rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
             }
             &:first-child {
                 img {
-                    width: 0.87rem;
-                    height: 0.87rem;
-                    left: 0.49rem;
+                    width: .87rem;
+                    height: .87rem;
+                    left: .49rem;
                 }
             }
         }
@@ -282,15 +245,15 @@ export default {
     z-index: 9;
     .promptLayerBox {
         width: 6.75rem;
-        padding: 0.45rem 0.31rem 0.45rem 0.36rem;
+        padding: .45rem .31rem .45rem .36rem;
         position: absolute;
         top: 2.71rem;
         left: 50%;
         transform: translateX(-50%);
         background: #fff;
-        line-height: 0.4rem;
-        color: #969ca3;
-        border-radius: 0.05rem;
+        line-height: .4rem;
+        color: #969CA3;
+        border-radius: .05rem;
     }
 }
 .identityLayer {
@@ -369,8 +332,8 @@ export default {
                     &.goPay {
                         width: 100%;
                         background: #ffc300;
-                        color: #3b444f;         
-                        margin-left: 0;                   
+                        color: #3b444f;
+                        margin-left: 0;
                     }
                 }
             }

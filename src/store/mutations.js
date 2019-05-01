@@ -18,6 +18,7 @@ const index = {
         state.isCalendarLoaded = true;
         state.calendar = data
         this.getters.getTakeCarDate
+        this.getters.setDefaulttakeCarDate
         this.getters.setDefaultRetCarDate
     }
 }

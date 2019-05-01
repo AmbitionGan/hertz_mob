@@ -11,14 +11,32 @@
 export default {
     name: 'choiceCityComHead',
     props: ['title'],
+    data () {
+        return {
+            path: ''
+        }
+    },
+    mounted () {
+        this.path = this.$route.path
+    },
     methods: {
         goBack () {
-            this.$router.go(-1)
+            if (this.path === '/' || this.path === '/list') {
+                this.$store.state.isShowChoiceCity = false
+                this.$store.state.isShowChoiceLand = false
+            }else{
+                this.$router.go(-1)
+            }
         },
         goHome () {
-            this.$router.push({
-                path: '/'
-            })
+            if (this.path === '/' || this.path === '/list') {
+                this.$store.state.isShowChoiceCity = false
+                this.$store.state.isShowChoiceLand = false
+            }else{
+                this.$router.push({
+                    path: '/'
+                })
+            }
         }
     }
 }

@@ -3,14 +3,14 @@
         <!--footer-->
         <div class="detailPage-footer">
           <div class="detailPage-footer-left">
-            <p v-show="$store.state.payState == 'online'">在线需付<br> USD <span>{{($store.state.insureRateState == true)?$store.state.dayRateTotal:$store.state.dayTotal}}</span><br>约RMB <span>{{($store.state.insureRateState == true)?$store.state.allRateTotal:$store.state.allTotal}}</span></p>
-            <p v-show="$store.state.payState == 'online' && $store.state.insureRateState == true">到店需付 <br> 约USD <span>{{$store.state.dayRateArriveTotal}}</span><br /></p>
-            <p v-show="$store.state.payState == 'arrive'">到店需付<br> USD <span>{{($store.state.insureRateState == true)?$store.state.dayRateArriveTotal:$store.state.dayArriveTotal}}</span><br>约RMB <span>{{($store.state.insureRateState == true)?$store.state.allRateArriveTotal:$store.state.allArriveTotal}}</span></p>
+            <p v-show="$store.state.payState == 'online'">在线需付<br> {{$store.state.unitMoney}} <span>{{($store.state.insureRateState == true)?$store.state.dayRateTotal:$store.state.dayTotal}}</span><br>约RMB <span>{{($store.state.insureRateState == true)?$store.state.allRateTotal:$store.state.allTotal}}</span></p>
+            <p v-show="$store.state.payState == 'online' && $store.state.insureRateState == true">到店需付 <br> 约{{$store.state.unitMoney}} <span>{{$store.state.dayRateArriveTotal}}</span><br /></p>
+            <p v-show="$store.state.payState == 'arrive'">到店需付<br> {{$store.state.unitMoney}} <span>{{($store.state.insureRateState == true)?$store.state.dayRateArriveTotal:$store.state.dayArriveTotal}}</span><br>约RMB <span>{{($store.state.insureRateState == true)?$store.state.allRateArriveTotal:$store.state.allArriveTotal}}</span></p>
             <p @click="dialogVisible = true" class="">费用 <br>明细</p>
           </div>
           <div class="detailPage-footer-right" @click="submitDetail">
             <p>预估总额 <br>
-              USD {{getTotalMoney()}}
+              {{$store.state.unitMoney}} {{getTotalMoney()}}
             </p>
             <p>提交订单</p>
           </div>
@@ -30,20 +30,20 @@
                     <div>
                       <p v-show="$store.state.payState == 'online'">
                         <span>在线支付包含</span>
-                        <span><span class="modal-body-leftSpan">USD {{($store.state.insureRateState == true)?$store.state.dayRateTotal:$store.state.dayTotal}}</span>  <span class="modal-body-rightSpan">约RMB {{($store.state.insureRateState == true)?$store.state.allRateTotal:$store.state.allTotal}}</span></span>
+                        <span><span class="modal-body-leftSpan">{{$store.state.unitMoney}} {{($store.state.insureRateState == true)?$store.state.dayRateTotal:$store.state.dayTotal}}</span>  <span class="modal-body-rightSpan">约RMB {{($store.state.insureRateState == true)?$store.state.allRateTotal:$store.state.allTotal}}</span></span>
                       </p>
                       <p v-show="$store.state.payState == 'arrive'">
                         <span>到店支付包含</span>
-                        <span><span class="modal-body-leftSpan">USD {{getArriveFunction()}}</span>  </span>
+                        <span><span class="modal-body-leftSpan">{{$store.state.unitMoney}} {{getArriveFunction()}}</span>  </span>
                       </p>
                       <ul class="modal-body-ul">
                         <li v-for="(items,index) in getContent()" :key="index">{{items}}</li>
                       </ul>
                     </div>
                     <div>
-                      <p v-show="$store.state.payState == 'online'">
+                      <p v-show="$store.state.payState == 'online' && $store.state.insureRateState == true">
                         <span>到店支付包含</span>
-                        <span><span class="modal-body-leftSpan">USD {{getArriveFunction()}}</span>  </span>
+                        <span><span class="modal-body-leftSpan">{{$store.state.unitMoney}} {{getArriveFunction()}}</span>  </span>
                       </p>
                       <ul class="modal-body-ul">
                         <li v-for="items in $store.state.resultGroup">{{turnInsureName(items).name}}</li>
@@ -144,8 +144,21 @@
         facility == true?facility=1:facility=0;
         var littleActive = 0;
         this.$store.state.payState == 'online'?littleActive=this.$store.state.littleOnline:littleActive=this.$store.state.littleArrive;
-        var url = '/submit/facility='+this.$store.state.equiChild1+','+this.$store.state.equiChild2+','+this.$store.state.equiChild3+'&facility2='+facility+'&active='+this.$store.state.insureIndex+','+littleActive;
-        window.location.href= url;
+        // var url = '/orderCompletion/facility='+this.$store.state.equiChild1+','+this.$store.state.equiChild2+','+this.$store.state.equiChild3+'&facility2='+facility+'&active='+this.$store.state.insureIndex+','+littleActive;
+        // window.location.href= url;
+        
+        let query = {
+            guid: this.$route.query.guid,
+            facility: this.$store.state.equiChild1+','+this.$store.state.equiChild2+','+this.$store.state.equiChild3,
+            facility2: facility,
+            active: this.$store.state.insureIndex+','+littleActive,
+            take: this.$route.query.take,
+            ret: this.$route.query.ret,
+        }
+        this.$router.push({
+            path: '/orderCompletion',
+            query: query
+        })
       }
     },
     computed: {}
