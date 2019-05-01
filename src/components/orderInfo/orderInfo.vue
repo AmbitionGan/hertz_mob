@@ -243,7 +243,7 @@
   </div>
 </template>
 <script>
-import orderApi from "../api/orderCompletion.js";
+import orderApi from "@/api/orderCompletion.js";
 import collapseTransition from "@/assets/js/collapse";
 export default {
   components: {
@@ -474,7 +474,7 @@ export default {
       .cancelled {
         height: 0.42rem;
         line-height: 0.42rem;
-        background: url(../assets/images/cancelImg.png) no-repeat;
+        background: url(../../assets/images/cancelImg.png) no-repeat;
         background-size: 0.41rem;
         padding-left: 0.63rem;
         font-size: 0.36rem;

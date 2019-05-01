@@ -10,7 +10,7 @@ import "./assets/js/TDES";
 import "./assets/css/common.less";
 import "../node_modules/swiper/dist/css/swiper.min.css";
 import "./assets/css/common.less";
-// import "./assets/css/lihailing-style.css";
+import "./assets/css/lihailing-style.css";
 
 // 注册全局 公共方法
 window["pubMethod"] = pubMethod;

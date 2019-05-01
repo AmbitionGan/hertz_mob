@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import orderApi from "../api/orderCompletion.js";
+import orderApi from "@/api/orderCompletion.js";
 export default {
   // 接受父组件的值
   props: {

@@ -122,7 +122,19 @@
     </div>
     <div class="contents">
       <span class="bold-color">Claims of Copyright Infringement.</span>
-      The Digital Millennium Copyright Act of 1998 (the "DMCA") provides recourse for copyright owners who believe that material appearing on the Internet infringes their rights under U.S. copyright law. If you believe in good faith that materials hosted by us infringe your copyright, you (or your agent) may send us a notice requesting that the material be removed, or access to it blocked. The notice must include the following information: (a) a physical or electronic signature of a person authorized to act on behalf of the owner of an exclusive right that is allegedly infringed; (b) identification of the copyrighted work claimed to have been infringed (or if multiple copyrighted works located on this website are covered by a single notification, a representative list of such works); (c) identification of the material that is claimed to be infringing or the subject of infringing activity, and information reasonably sufficient to allow us to locate the material on the website; (d) the name, address, telephone number, and email address (if available) of the complaining party; (e) a statement that the complaining party has a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law; and (f) a statement that the information in the notification is accurate, and under penalty of perjury, that the complaining party is authorized to act on behalf of the owner of an exclusive right that is allegedly infringed. If you believe in good faith that a notice of copyright infringement has been wrongly filed against you, the DMCA permits you to send us a counter-notice. Notices and counter-notices must meet the then-current statutory requirements imposed by the DMCA; see http://www.loc.gov/copyright/ for details. Notices and counter-notices with respect to this website should be sent to Richard McEvily, Staff Vice President and Deputy General Counsel, The Hertz Corporation, 225 Brae Boulevard, Park Ridge, NJ 07656, (201) 307-2000, dmcanotice@hertz.com. We suggest that you consult your legal advisor before filing a notice or counter-notice. Also, be aware that there can be penalties for false claims under the DMCA.
+      The Digital Millennium Copyright Act of 1998 (the "DMCA") provides recourse for copyright owners who believe that material appearing on the Internet infringes their rights under U.S. copyright law. If you believe in good faith that materials hosted by us infringe your copyright, you (or your agent) may send us a notice requesting that the material be removed, or access to it blocked. The notice must include the following information: (a) a physical or electronic signature of a person authorized to act on behalf of the owner of an exclusive right that is allegedly infringed; (b) identification of the copyrighted work claimed to have been infringed (or if multiple copyrighted works located on this website are covered by a single notification, a representative list of such works); (c) identification of the material that is claimed to be infringing or the subject of infringing activity, and information reasonably sufficient to allow us to locate the material on the website; (d) the name, address, telephone number, and email address (if available) of the complaining party; (e) a statement that the complaining party has a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law; and (f) a statement that the information in the notification is accurate, and under penalty of perjury, that the complaining party is authorized to act on behalf of the owner of an exclusive right that is allegedly infringed. If you believe in good faith that a notice of copyright infringement has been wrongly filed against you, the DMCA permits you to send us a counter-notice. Notices and counter-notices must meet the then-current statutory requirements imposed by the DMCA; see
+      <a
+        href="http://www.loc.gov/copyright/ "
+        target="_blank"
+        class="red-color"
+      >http://www.loc.gov/copyright/</a>
+      for details. Notices and counter-notices with respect to this website should be sent to Richard McEvily, Staff Vice President and Deputy General Counsel, The Hertz Corporation, 225 Brae Boulevard, Park Ridge, NJ 07656, (201) 307-2000,
+      <a
+        href="dmcanotice@hertz.com "
+        target="_blank"
+        class="red-color"
+      >dmcanotice@hertz.com</a>.
+      We suggest that you consult your legal advisor before filing a notice or counter-notice. Also, be aware that there can be penalties for false claims under the DMCA.
     </div>
     <div class="contents">
       <span class="bold-color">Void Where Prohibited.</span>
@@ -217,33 +229,81 @@
       <span class="bold-color">Website Operator and Contact Information.</span>
       This website is operated by The Hertz Corporation. Here is our contact information for the following European countries:
     </div>
-    <div
-      class="contents"
-    >(a) in Belgium, you may contact Hertz Belgium N.V. at Excelsiorlaan 20, 1930 Zaventem, Belgium, 0032 2 717 32 07 (telephone), 0032 2 717 32 08 (facsimile), customer-relations-be@hertz.com, VAT Number BE 401 678 879, Trade registration number HRB 389 009;</div>
-    <div
-      class="contents"
-    >(b) in France, you may contact Hertz France S.A. at 1 rue Eugène Henaff, 78198 Trappes Cedex, France, 0825-800-900 (telephone), 0825-803-001 (facsimile), customer-relations-fr@hertz.com, VAT Number FR 59 319 505 632, Trade registration number 319 505 632 RCS VERSAILLES;</div>
+    <div class="contents">
+      (a) in Belgium, you may contact Hertz Belgium N.V. at Excelsiorlaan 20, 1930 Zaventem, Belgium, 0032 2 717 32 07 (telephone), 0032 2 717 32 08 (facsimile),
+      <a
+        href="customer-relations-be@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-be@hertz.com</a>
+      , VAT Number BE 401 678 879, Trade registration number HRB 389 009;
+    </div>
+    <div class="contents">
+      (b) in France, you may contact Hertz France S.A. at 1 rue Eugène Henaff, 78198 Trappes Cedex, France, 0825-800-900 (telephone), 0825-803-001 (facsimile),
+      <a
+        href="customer-relations-fr@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-fr@hertz.com</a>
+      , VAT Number FR 59 319 505 632, Trade registration number 319 505 632 RCS VERSAILLES;
+    </div>
     <div
       class="contents"
     >(c) in Germany, you may contact Hertz Autovermietung GmbH at Ludwig-Erhard-Straße 12, D-65760 Eschborn, Germany, 00 49 6196 9370 (telephone), 00 49 6196 937 289 (facsimile), VAT Number DE-813881939, Trade Registration number HRB 52255;</div>
-    <div
-      class="contents"
-    >(d) in Great Britain, you may contact Hertz UK Ltd at 34-62 Staines Road, Hounslow, Middx TW3 3LZ, United Kingdom, (0044) 207 744 0067 (telephone), (0044) 207 744 0089 (facsimile), customer-relations-uk@hertz.com, VAT Number 219334568, Trade registration number 597994;</div>
-    <div
-      class="contents"
-    >(e) in Italy, you may contact Hertz Italiana SpA at CSD - Ufficio Clienti, V.le L. da Vinci 421, 00145 Roma, Italia, (0039) (02) 69430019 (telephone), (0039) (02) 69430020 (facsimile), customer-relations-it@hertz.com, VAT Number Cod.Fisc. 00433120581 / P.IVA 00890931009, Trade registration number Reg.Imp. RM 09119601807;</div>
-    <div
-      class="contents"
-    >(f) in Luxemburg, you may contact Hertz Luxembourg S.A. at Aéroport de Findel, 1110 Luxemburg, Luxemburg, 0032 2 717 32 07 (telephone), 0032 2 717 32 08 (facsimile), customer-relations-be@hertz.com, VAT Number LU 10861939, Trade registration number RC B-8777;</div>
-    <div
-      class="contents"
-    >(g) in Netherlands, you may contact Hertz Automobielen Nederland B.V. at PO Box 270, 2130 AG Hoofddorp, Netherlands, 0031 20 2013519 (telephone), 0031 20 2013520 (facsimile), customer-relations-ne@hertz.com, VAT Number 005485544B01, Trade registration number KvK 34049337;</div>
-    <div
-      class="contents"
-    >(h) in Spain, you may contact Hertz de España S.A. at José Echegaray,6, Edificio B -1a, 28230 Las Rozas, Madrid, Spain 00 34 91 749 77 78 (telephone), 00 34 91 749 77 79 (facsimile), customer-relations-es@hertz.com, VAT Number A-28121549; and</div>
-    <div
-      class="contents"
-    >(i) in Switzerland, you may contact Hertz Autovermietung AG at Ifangstrasse 8, CH-8952 Zuerich Schlieren, Switzerland, 0041 1 212 2626 (telephone), 0041 1 730 1244 (facsimile), customer-relations-sz@hertz.com, VAT Number 231795, Trade registration number 020.3.911.482.7.</div>
+    <div class="contents">
+      (d) in Great Britain, you may contact Hertz UK Ltd at 34-62 Staines Road, Hounslow, Middx TW3 3LZ, United Kingdom, (0044) 207 744 0067 (telephone), (0044) 207 744 0089 (facsimile),
+      <a
+        href="customer-relations-uk@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-uk@hertz.com</a>
+      , VAT Number 219334568, Trade registration number 597994;
+    </div>
+    <div class="contents">
+      (e) in Italy, you may contact Hertz Italiana SpA at CSD - Ufficio Clienti, V.le L. da Vinci 421, 00145 Roma, Italia, (0039) (02) 69430019 (telephone), (0039) (02) 69430020 (facsimile),
+      <a
+        href="customer-relations-it@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-it@hertz.com</a>
+      , VAT Number Cod.Fisc. 00433120581 / P.IVA 00890931009, Trade registration number Reg.Imp. RM 09119601807;
+    </div>
+    <div class="contents">
+      (f) in Luxemburg, you may contact Hertz Luxembourg S.A. at Aéroport de Findel, 1110 Luxemburg, Luxemburg, 0032 2 717 32 07 (telephone), 0032 2 717 32 08 (facsimile),
+      <a
+        href="customer-relations-be@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-be@hertz.com</a>
+      , VAT Number LU 10861939, Trade registration number RC B-8777;
+    </div>
+    <div class="contents">
+      (g) in Netherlands, you may contact Hertz Automobielen Nederland B.V. at PO Box 270, 2130 AG Hoofddorp, Netherlands, 0031 20 2013519 (telephone), 0031 20 2013520 (facsimile),
+      <a
+        href="customer-relations-ne@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-ne@hertz.com</a>
+      , VAT Number 005485544B01, Trade registration number KvK 34049337;
+    </div>
+    <div class="contents">
+      (h) in Spain, you may contact Hertz de España S.A. at José Echegaray,6, Edificio B -1a, 28230 Las Rozas, Madrid, Spain 00 34 91 749 77 78 (telephone), 00 34 91 749 77 79 (facsimile),
+      <a
+        href="customer-relations-es@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-es@hertz.com</a>
+      , VAT Number A-28121549; and
+    </div>
+    <div class="contents">
+      (i) in Switzerland, you may contact Hertz Autovermietung AG at Ifangstrasse 8, CH-8952 Zuerich Schlieren, Switzerland, 0041 1 212 2626 (telephone), 0041 1 730 1244 (facsimile),
+      <a
+        href="customer-relations-sz@hertz.com"
+        target="_blank"
+        class="red-color"
+      >customer-relations-sz@hertz.com</a>
+      , VAT Number 231795, Trade registration number 020.3.911.482.7.
+    </div>
   </div>
 </template>
 <script>
@@ -272,6 +332,9 @@ export default {
         padding: 0.1rem 0.3rem;
       }
     }
+  }
+  .red-color {
+    color: red;
   }
 }
 </style>

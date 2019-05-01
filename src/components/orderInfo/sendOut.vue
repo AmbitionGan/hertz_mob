@@ -22,6 +22,7 @@
           class="group-input p-input"
           v-model="sendParams.phone"
           placeholder="电话（用于接收订单信息）"
+          onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')"
         >
         <div style="clear:both"></div>
         <div v-if="isOpenCode" class="code-list-box">
@@ -41,7 +42,7 @@
   </div>
 </template>
 <script>
-import orderApi from "../api/orderCompletion.js";
+import orderApi from "@/api/orderCompletion.js";
 export default {
   data() {
     return {
@@ -52,7 +53,7 @@ export default {
       },
       isOpenCode: false, //区号列表显隐
       codeList: [], //国际区号列表
-      phoneVerification: "" //手机号正则验证
+      phoneVerification: null //手机号正则验证
     };
   },
   mounted() {
@@ -70,7 +71,9 @@ export default {
         .then(res => {
           this.codeList = res.Result;
           this.sendParams.areacode = this.codeList[0].mobileCode;
-          this.phoneVerification = this.codeList[0].Regex;
+          this.phoneVerification = eval(
+            this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
+          );
         })
         .catch(res => {});
     },
@@ -81,7 +84,9 @@ export default {
     // 选择国际区号
     changeCode(item) {
       this.sendParams.areacode = item.mobileCode;
-      this.phoneVerification = item.Regex;
+      this.phoneVerification = eval(
+        item.Regex.replace("\\/", "/").replace("\\/", "/")
+      );
       this.isOpenCode = false;
     },
     // 发送邮箱接口
@@ -118,8 +123,8 @@ export default {
             alert(res.ErrorMsg);
           }
         })
-        .catch(res => {
-          alert(res.ErrorMsg);
+        .catch(err => {
+          alert(err.ErrorMsg);
         });
     },
     // 确认发送
@@ -127,17 +132,31 @@ export default {
       if (!this.sendParams.email && !this.sendParams.phone)
         return alert("请输入邮箱或区号和电话");
       if (this.sendParams.email && !this.sendParams.phone) {
+        if (
+          !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
+            this.sendParams.email
+          )
+        )
+          return alert("邮箱格式错误，请重新输入");
         this.sendEmail();
       }
       if (!this.sendParams.email && this.sendParams.phone) {
-        if (!this.phoneVerification.test(this.sendParams.phone)) {
+        if (
+          !this.phoneVerification.test(
+            this.sendParams.areacode + this.sendParams.phone
+          )
+        ) {
           alert("电话格式错误，请重新输入");
         } else {
           this.sendSms();
         }
       }
       if (this.sendParams.email && this.sendParams.phone) {
-        if (!this.phoneVerification.test(this.sendParams.phone)) {
+        if (
+          !this.phoneVerification.test(
+            this.sendParams.areacode + this.sendParams.phone
+          )
+        ) {
           alert("电话格式错误，请重新输入");
         } else {
           this.sendSms();
@@ -151,8 +170,10 @@ export default {
 <style lang="less" scoped>
 .send-page {
   height: 100vh;
+  background: #fff;
+  padding-top: 1.03rem;
+
   .page-content {
-    margin-top: 1.03rem;
     padding: 0 0.4rem;
     .content-group {
       width: 100%;
