@@ -7,14 +7,34 @@ const routerConfig = {
     mode: 'history',
     routes: [
         {
-        path: '/',
-        name: 'index',
-        component: () => import('@/components/index')
+            path: '/',
+            name: 'index',
+            component: () => import('@/components/index')
         },
         {
-        path: '/login',
-        name: 'login',
-        component: () => import('@/components/member/login')
+            path: '/choiceCity',
+            name: 'choiceCity',
+            component: () => import('@/components/common/choiceCity')
+        },
+        {
+            path: '/onlinePay',
+            name: 'onlinePay',
+            component: () => import('@/components/onlinePay/index')
+        },
+        {
+            path: '/choiceLandMark',
+            name: 'choiceLandMark',
+            component: () => import('@/components/common/choiceLandMark')
+        },
+        {
+          path: '/list',
+          name: 'list',
+          component: () => import('@/components/list/list')
+        },
+        {
+          path: '/details',
+          name: 'carDetails',
+          component: () => import('@/components/details/details')
         }
     ]
 }

@@ -7,7 +7,7 @@ import axios from 'axios'
  */
 
 switch (process.env.NODE_ENV) {
-    case 'development': 
+    case 'development':
         axios.defaults.baseURL = '/api';
         break;
     case 'production':
@@ -21,7 +21,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 /**
  * @desc jsonp格式转json格式
- * @param {String} str 
+ * @param {String} str
  */
 function jsonpChangeJson (str) {
     let matches = str.replace(/^\w+\(/g, '').replace(/\)$/g, '');
@@ -40,7 +40,7 @@ const service = {
                 params: params
             })
             .then(res => {
-                
+
                 resolve(jsonpChangeJson(res.data));
             })
             .catch(err => {
@@ -53,7 +53,7 @@ const service = {
      * @param {String} url 请求地址
      * @param {Object} params 请求参数
      */
-    post () {
+    post (url, params) {
         return new Promise((resolve, reject) => {
             axios.post(url, JSON.stringify(params))
             .then(res => {
