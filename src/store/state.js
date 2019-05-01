@@ -7,7 +7,7 @@
 // 公共参数
 const common = {
     // 是否登陆
-    isLogined: false,
+    isLogined: true,
     // 是否是代理商登陆
     isagent: false
 
