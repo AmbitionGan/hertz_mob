@@ -226,7 +226,10 @@
         <div v-if="priceInfo.offline>0">
           <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
         </div>
-        <div class="youhuiMessage">
+        <div
+          class="youhuiMessage"
+          v-if="counpon.discountgu||counpon.fulldiscountgu||counpon.cdpgu||counpon.pcgu"
+        >
           <p>优惠信息</p>
           <p class="discount-info" v-if="counpon.discountgu">{{counpon.discountgu}}</p>
           <p class="discount-info" v-if="counpon.fulldiscountgu">{{counpon.fulldiscountgu}}</p>
@@ -234,7 +237,7 @@
           <p class="discount-info" v-if="counpon.pcgu">{{counpon.pcgu}}</p>
         </div>
         <div class="youhuiMessage last-div">
-          <p>
+          <p v-if="priceInfo.befortotal>0">
             <span>优惠前价格</span>
             <span
               style="text-decoration: line-through;color:#9EA3AA"
@@ -490,9 +493,7 @@ export default {
     getvehDetails() {
       orderApi
         .getvehDetails({
-          guid: this.$route.query.guid
-            ? this.$route.query.guid
-            : "5760bde6-162a-4e3f-a934-52380f5bc92b"
+          guid: this.$route.query.guid ? this.$route.query.guid : ""
         })
         .then(res => {
           if (res.ErrorCode == 0) {
@@ -507,12 +508,10 @@ export default {
                   : "0"
               ];
             this.rateParams.guid = params.param_guid; //获取价格信息 保险参数 GUID       通过获取保险信息之后 拿地址栏内的active 赋值给获取价格信息需要的guid 参数
-            if (params.tournumber) {
-              //tournumber存在 是在线支付 不存在是到店支付
-              this.couponParams.type = 1;
-            } else {
-              this.couponParams.type = 2;
-            }
+            //tournumber存在 是在线支付 不存在是到店支付
+            params.tournumber == ""
+              ? (this.couponParams.type = 2)
+              : (this.couponParams.type = 1);
             this.isReturnfare = params.returnfare; //异地还车保险
             this.onlineInsurance = params.inclusions.inclusions_cn.split(","); //在线支付保险
             this.couponParams.country_code = res.Result.country_code; //国家
