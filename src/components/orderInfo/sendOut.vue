@@ -228,13 +228,13 @@ export default {
         font-size: 0.24rem;
         margin-right: 0.26rem;
         input {
-          color: #707275;
           font-size: 0.24rem;
           display: inline-block;
           width: 46%;
         }
         textarea:disabled,
         input:disabled {
+        color: #333;
           background-color: #fff;
         }
         img {

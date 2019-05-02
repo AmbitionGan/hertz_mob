@@ -1,11 +1,11 @@
 import Http from "./service";
 function encryption(obj) {
-  console.log(obj, "obj");
-  for (var key in obj) {
-    if (obj[key]) {
-      obj[key] = TDES.encrypt(obj[key]);
-    }
-  }
+//   for (var key in obj) {
+//     if (obj[key]) {
+//       obj[key] = TDES.encrypt(obj[key]);
+//     }
+//   }
+  return obj
 }
 
 /**

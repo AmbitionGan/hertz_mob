@@ -84,7 +84,7 @@
               <li v-for="(item,index) in details.details_qualifier.split(',')" :key="index">{{item}}</li>
             </ul>
           </div>
-          <div v-if="priceInfo.offline_pay>0">
+          <div v-if="details.offline_pay>0">
             <p>
               <span>到店支付包含</span>
               <span>
@@ -109,7 +109,7 @@
               >{{items}}</li>
             </ul>
           </div>
-          <div v-if="priceInfo.offline_pay>0">
+          <div v-if="details.offline_pay>0">
             <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
           </div>
           <div
@@ -127,7 +127,7 @@
             <p class="discount-info" v-if="details.pc_name">{{details.pc_name}}</p>
           </div>
           <div class="youhuiMessage last-div">
-            <p v-if="details.beforeoffer_pay>0">
+            <p v-if="details.discount_name||details.full_discountname||details.cdp_name||details.pc_name">
               <span>优惠前价格</span>
               <span
                 style="text-decoration: line-through;color:#9EA3AA"
@@ -252,7 +252,6 @@ import orderApi from "@/api/orderCompletion.js";
 import collapseTransition from "@/assets/js/collapse";
 import choiceCityComHead from "@/components/common/choiceCityComHead"; //顶部
 import carDetails from "@/components/common/carDetails";
-import logos from "@/assets/js/common";
 import { common } from "@/assets/mixin/common";
 export default {
   components: {
@@ -290,9 +289,9 @@ export default {
         .then(res => {
           if (res.ErrorCode == 0) {
             if (res.Result[0]) {
-              this.$store.state.detailBrands = logos.getBrandLogo(
+              this.$store.state.detailBrands = pubMethod.getBrandLogo(
                 res.Result[0].brands
-              );
+              ).images;
               // //取车地址
               this.$store.state.picAddress =
                 res.Result[0].pickuplocation_details.description_location_name;
@@ -342,7 +341,8 @@ export default {
       this.$router.push({
         path: "/cancelReserve",
         query: {
-          guid: this.details.guid
+          guid: this.details.guid,
+          time: this.details.pickup_datetime.replace("T", "")
         }
       });
     },

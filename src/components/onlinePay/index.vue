@@ -24,175 +24,133 @@
       <carDetails />
       <!-- 费用明细 -->
       <div class="detailsCharges">
-        <div class="titleCharges" @click.stop="clickOpen('Charges')">
+        <div class="titleCharges">
           费用明细
         </div>
           <div class="infoCharges">
-            <div v-if="orderDetail.order_type != 'Offline'">
-              <p>
+            <div v-if="orderDetail.order_type!='Offline'">
+                <p>
                 <span>在线支付包含</span>
                 <span>
-                  <span class="leftSpan"
-                    >{{ orderDetail.online_currency }}&nbsp;{{
-                      orderDetail.online_pay
-                    }}</span
-                  >
-                  <!-- <span class="rightSpan">约{{orderDetail.}}&nbsp;{{orderDetail.}}</span> -->
+                    <span class="leftSpan">{{orderDetail.online_currency}}&nbsp;{{orderDetail.online_pay}}</span>
+                    <!-- <span class="rightSpan">约{{orderDetail.}}&nbsp;{{orderDetail.}}</span> -->
                 </span>
-              </p>
-              <ul class="insurance-ul" v-if="orderDetail.order_type == 'Online'">
-                <li
-                  v-for="(item, index) in orderDetail.details_qualifier.split(',')"
-                  :key="index"
-                >
-                  {{ item }}
-                </li>
-              </ul>
+                </p>
+                <ul class="insurance-ul" v-if="orderDetail.order_type=='Online'">
+                <li v-for="(item,index) in orderDetail.details_qualifier.split(',')" :key="index">{{item}}</li>
+                </ul>
             </div>
-            <div>
-              <p>
+            <div v-if="orderDetail.offline_pay>0">
+                <p>
                 <span>到店支付包含</span>
                 <span>
-                  <span class="modal-body-leftSpan"
-                    >{{ orderDetail.offline_currency }}
-                    {{ orderDetail.offline_pay }}</span
-                  >
+                    <span
+                    class="modal-body-leftSpan"
+                    >{{orderDetail.offline_currency}} {{orderDetail.offline_pay}}</span>
                 </span>
-              </p>
-              <ul class="insurance-ul" v-if="orderDetail.details_qualifier">
+                </p>
+                <ul class="insurance-ul" v-if="orderDetail.details_qualifier">
                 <li
-                  v-for="(i, indexs) in orderDetail.details_qualifier.split(',')"
-                  :key="'un' + indexs"
-                >
-                  {{ i }}
-                </li>
-              </ul>
-              <ul class="insurance-ul" v-if="orderDetail.extra_equipment">
+                    v-for="(i,indexs) in orderDetail.details_qualifier.split(',')"
+                    :key="'un'+indexs"
+                >{{i}}</li>
+                </ul>
+                <ul class="insurance-ul" v-if="orderDetail.extra_equipment">
+                <li v-for="(item,index) in orderDetail.extra_equipment.split(',')" :key="index">{{item}}</li>
+                </ul>
+                <ul class="insurance-ul" v-if="orderDetail.extra_service">
                 <li
-                  v-for="(item, index) in orderDetail.extra_equipment.split(',')"
-                  :key="index"
-                >
-                  {{ item }}
-                </li>
-              </ul>
-              <ul class="insurance-ul" v-if="orderDetail.extra_service">
-                <li
-                  v-for="(items, index) in orderDetail.extra_service.split(',')"
-                  :key="'a' + index"
-                >
-                  {{ items }}
-                </li>
-              </ul>
+                    v-for="(items,index) in orderDetail.extra_service.split(',')"
+                    :key="'a'+index"
+                >{{items}}</li>
+                </ul>
             </div>
-            <div>
-              <span class="tips"
-                >(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span
-              >
+            <div v-if="orderDetail.offline_pay>0">
+                <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
             </div>
-            <div class="youhuiMessage">
-              <p>优惠信息</p>
-              <!--打折优惠名称 -->
-              <p class="discount-info" v-if="orderDetail.discount_name">
-                {{ orderDetail.discount_name }}
-              </p>
-              <!--满减优惠名称 -->
-              <p class="discount-info" v-if="orderDetail.full_discountname">
-                {{ orderDetail.full_discountname }}
-              </p>
-              <!--CDP优惠名称  -->
-              <p class="discount-info" v-if="orderDetail.cdp_name">
-                {{ orderDetail.cdp_name }}
-              </p>
-              <!--PC优惠名称  -->
-              <p class="discount-info" v-if="orderDetail.pc_name">
-                {{ orderDetail.pc_name }}
-              </p>
+            <div
+                class="youhuiMessage"
+                v-if="orderDetail.discount_name||orderDetail.full_discountname||orderDetail.cdp_name||orderDetail.pc_name"
+            >
+                <p>优惠信息</p>
+                <!--打折优惠名称 -->
+                <p class="discount-info" v-if="orderDetail.discount_name">{{orderDetail.discount_name}}</p>
+                <!--满减优惠名称 -->
+                <p class="discount-info" v-if="orderDetail.full_discountname">{{orderDetail.full_discountname}}</p>
+                <!--CDP优惠名称  -->
+                <p class="discount-info" v-if="orderDetail.cdp_name">{{orderDetail.cdp_name}}</p>
+                <!--PC优惠名称  -->
+                <p class="discount-info" v-if="orderDetail.pc_name">{{orderDetail.pc_name}}</p>
             </div>
             <div class="youhuiMessage last-div">
-              <p>
+                <p v-if="orderDetail.beforeoffer_pay != orderDetail.total_pay">
                 <span>优惠前价格</span>
-                <span style="text-decoration: line-through;color:#9EA3AA"
-                  >{{ orderDetail.beforeoffer_currency }}&nbsp;{{
-                    orderDetail.beforeoffer_pay
-                  }}</span
-                >
-              </p>
-              <p class>
+                <span
+                    style="text-decoration: line-through;color:#9EA3AA"
+                >{{orderDetail.beforeoffer_currency}}&nbsp;{{orderDetail.beforeoffer_pay}}</span>
+                </p>
+                <p v-if="orderDetail.total_pay>0">
                 <span>订单总额</span>
                 <span class="origin">
-                  {{ orderDetail.total_currency }}
-                  <span class="fot-38">{{ orderDetail.total_pay }}</span>
+                    {{orderDetail.total_currency}}
+                    <span class="fot-38">{{orderDetail.total_pay}}</span>
                 </span>
-              </p>
-              <p class="last-p spancolor-hui">
-                约{{ orderDetail.exchange_currency }}&nbsp;{{
-                  orderDetail.exchange_pay
-                }}
-              </p>
+                </p>
+                <p
+                class="last-p spancolor-hui"
+                >约{{orderDetail.exchange_currency}}&nbsp;{{orderDetail.exchange_pay}}</p>
             </div>
-          </div>
+            </div>
       </div>
       <!-- 驾驶人信息 -->
       <div class="driver-modular">
-        <div class="titleCharges" @click="clickOpen('Driver')">
+        <div class="titleCharges">
           <span>驾驶人信息</span>
         </div>
           <div class="driver-info">
-            <ul>
-              <li>
-                <span>名</span>
-                <span>{{ orderDetail.sur_name }}</span>
-              </li>
-              <li>
-                <span>姓</span>
-                <span>{{ orderDetail.given_name }}</span>
-              </li>
-              <li>
-                <span>年龄</span>
-                <span>{{ orderDetail.a_ge }}</span>
-              </li>
-              <li>
-                <span>电子邮箱</span>
-                <span>{{ orderDetail.e_mail }}</span>
-              </li>
-              <li>
-                <span>电话</span>
-                <span
-                  >{{ orderDetail.areacity_code }}&nbsp;{{
-                    orderDetail.phone_number
-                  }}</span
-                >
-              </li>
-              <li v-if="orderDetail.gold_cardnum">
-                <span>Hertz金卡号</span>
-                <span>{{ orderDetail.gold_cardnum }}</span>
-              </li>
-              <li v-if="orderDetail.passenger_num">
-                <span>常旅客号</span>
-                <span>{{ orderDetail.passenger_num }}</span>
-              </li>
-              <li v-if="orderDetail.emergency_contactname">
-                <span>紧急联系人姓名</span>
-                <span>{{ orderDetail.emergency_contactname }}</span>
-              </li>
-              <li
-                v-if="
-                  orderDetail.emergency_contactcode && orderDetail.emergency_contacttel
-                "
-              >
-                <span>紧急联系人手机号</span>
-                <span
-                  >{{ orderDetail.emergency_contactcode }}&nbsp;{{
-                    orderDetail.emergency_contacttel
-                  }}</span
-                >
-              </li>
-            </ul>
-          </div>
+          <ul>
+            <li>
+              <span>名</span>
+              <span>{{orderDetail.sur_name}}</span>
+            </li>
+            <li>
+              <span>姓</span>
+              <span>{{orderDetail.given_name}}</span>
+            </li>
+            <li>
+              <span>年龄</span>
+              <span>{{orderDetail.a_ge}}</span>
+            </li>
+            <li>
+              <span>电子邮箱</span>
+              <span>{{orderDetail.e_mail}}</span>
+            </li>
+            <li>
+              <span>电话</span>
+              <span>{{orderDetail.areacity_code}}&nbsp;{{orderDetail.phone_number}}</span>
+            </li>
+            <li v-if="orderDetail.gold_cardnum">
+              <span>Hertz金卡号</span>
+              <span>{{orderDetail.gold_cardnum}}</span>
+            </li>
+            <li v-if="orderDetail.passenger_num">
+              <span>常旅客号</span>
+              <span>{{orderDetail.passenger_num}}</span>
+            </li>
+            <li v-if="orderDetail.emergency_contactname">
+              <span>紧急联系人姓名</span>
+              <span>{{orderDetail.emergency_contactname}}</span>
+            </li>
+            <li v-if="orderDetail.emergency_contactcode&&orderDetail.emergency_contacttel">
+              <span>紧急联系人手机号</span>
+              <span>{{orderDetail.emergency_contactcode}}&nbsp;{{orderDetail.emergency_contacttel}}</span>
+            </li>
+          </ul>
+        </div>
       </div>
       <!-- 取车前免费取消 -->
       <div class="cancel-prompt">
-        <div class="titleCharges" @click="clickOpen('Prompt')">
+        <div class="titleCharges">
           取车前免费取消
         </div>
           <div class="cancel-info">
@@ -661,6 +619,9 @@ export default {
     margin-top: 0.19rem;
     background: #fff;
     .infoCharges {
+        li:last-of-type(1){
+            border-right: none!important;
+        }
       padding: 0.4rem;
       .youhuiMessage {
         .discount-info {

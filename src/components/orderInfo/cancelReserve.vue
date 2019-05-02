@@ -21,7 +21,7 @@
         <input type="text" class="inputs" placeholder="请输入下单时预订人邮箱">
       </div>
       <div class="content-tips">
-        注：订单可在去取车时间（当地时间：2018.07.16 10:00）
+        注：订单可在去取车时间（当地时间：{{$route.query.time}}）
         前免费取消。订单一旦取消，将不可恢复。
       </div>
       <div class="footer">
@@ -81,6 +81,7 @@ export default {
       if (this.isCancel) {
         this.isCancel = false;
         this.$loadingToast.show();
+        this.cancelForm.guid = this.$route.query.guid
         orderApi
           .cancelOrder(this.cancelForm)
           .then(res => {
