@@ -89,13 +89,15 @@
 </template>
 
 <script>
-import orderApi from "../api/orderCompletion.js";
+import orderApi from "@/api/orderCompletion.js";
+import { common } from "@/assets/mixin/common";
 export default {
   // 接受父组件的值
   props: {
     couponParams: Object,
     required: true
   },
+  mixins: [common],
   data() {
     return {
       type: "available",
@@ -239,7 +241,7 @@ export default {
             this.$emit("childByshow", false);
           }
           if (aSelect1.length == 0) {
-            alert("请选择优惠券");
+            this.messageLayer("请选择优惠券");
           }
         }
       }

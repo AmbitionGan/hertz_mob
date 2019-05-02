@@ -1,11 +1,12 @@
 <template>
   <div class="cancel-page" @click="clickClose">
+    <choiceCityComHead title="取消预定"></choiceCityComHead>
     <div class="cancel-content">
       <div class="content-group">
         <p class="group-p">取消原因</p>
         <div class="group-div" @click.stop="openBox">
           <input type="text" class="inputs" v-model="cancelForm.why" placeholder="请选择取消原因" disabled>
-          <img src="@/assets/images/select.png" :class="{'imginverse':isOpenBox}" alt="">
+          <img src="@/assets/images/select.png" :class="{'imginverse':isOpenBox}" alt>
           <div v-if="isOpenBox" class="resaon-list-box">
             <ul>
               <li v-for="(item,index) in reasonList" :key="index" @click.stop="changeReason(item)">
@@ -32,55 +33,81 @@
   </div>
 </template>
 <script>
-import orderApi from '../api/orderCompletion.js'
+import orderApi from "@/api/orderCompletion.js";
+import choiceCityComHead from "@/components/common/choiceCityComHead"; //顶部
+import { common } from "@/assets/mixin/common";
 export default {
+  components: {
+    choiceCityComHead
+  },
+  mixins: [common],
   data() {
     return {
       isOpenBox: false,
-      reasonList: ['行程有变', '取/还车时间有误', '其他'],
+      reasonList: ["行程有变", "取/还车时间有误", "其他"],
       cancelForm: {
-        why: '', //取消原因
-        email: '', //订单邮箱
-        guid: ''
-      }
-    }
+        why: "", //取消原因
+        email: "", //订单邮箱
+        guid: ""
+      },
+      isCancel: true //防止重复提交
+    };
   },
   methods: {
     clickClose() {
-      this.isOpenBox = false
+      this.isOpenBox = false;
     },
     // 打开原因列表
     openBox() {
-      this.isOpenBox = !this.isOpenBox
+      this.isOpenBox = !this.isOpenBox;
     },
     // 选择取消原因
     changeReason(item) {
-      this.cancelForm.why = item
-      this.isOpenBox = false
+      this.cancelForm.why = item;
+      this.isOpenBox = false;
     },
     // 再想想
     noCancel() {},
     // 确认取消
     sureCancel() {
-      if (!this.cancelForm.why) return alert('请选择取消原因')
-      if (!this.cancelForm.email) return alert('请填写订单邮箱')
-      orderApi
-        .cancelOrder(this.cancelForm)
-        .then(res => {
-          if (res.ErrorCode == 0) {
-            this.$router.push({ path: '/orderInfo', query: { guid: res.Result } })
-          }
-        })
-        .catch(res => {
-          alert(res.ErrorMsg)
-        })
+      if (!this.cancelForm.why) return this.messageLayer("请选择取消原因");
+      if (!this.cancelForm.email) return this.messageLayer("请填写订单邮箱");
+      if (
+        !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
+          this.cancelForm.email
+        )
+      )
+        return this.messageLayer("邮箱格式错误，请重新输入");
+      if (this.isCancel) {
+        this.isCancel = false;
+        this.$loadingToast.show();
+        orderApi
+          .cancelOrder(this.cancelForm)
+          .then(res => {
+            this.$loadingToast.close();
+            if (res.ErrorCode == 0) {
+              this.$router.push({
+                path: "/orderInfo",
+                query: { guid: res.Result }
+              });
+            }
+            this.isCancel = true;
+          })
+          .catch(res => {
+            this.$loadingToast.close();
+            this.messageLayer(res.ErrorMsg);
+            this.isCancel = true;
+          });
+      }
     }
   },
   mounted() {}
-}
+};
 </script>
 <style lang="less" scoped>
 .cancel-page {
+  height: 100vh;
+  background: #fff;
   .cancel-content {
     padding: 1.03rem 0.4rem 0 0.4rem;
     .content-group {
@@ -166,13 +193,21 @@ export default {
         width: 47.45%;
       }
       button:nth-child(1) {
-        background: linear-gradient(180deg, rgba(149, 156, 164, 1), rgba(88, 89, 91, 1));
+        background: linear-gradient(
+          180deg,
+          rgba(149, 156, 164, 1),
+          rgba(88, 89, 91, 1)
+        );
         box-shadow: 0px 5px 24px 0px rgba(0, 0, 0, 0.26);
         float: left;
         color: rgba(255, 255, 255, 1);
       }
       button:nth-child(2) {
-        background: linear-gradient(0deg, rgba(255, 186, 0, 1), rgba(255, 204, 0, 1));
+        background: linear-gradient(
+          0deg,
+          rgba(255, 186, 0, 1),
+          rgba(255, 204, 0, 1)
+        );
         box-shadow: 0px 5px 24px 0px rgba(0, 0, 0, 0.26);
         float: right;
         color: rgba(59, 68, 79, 1);

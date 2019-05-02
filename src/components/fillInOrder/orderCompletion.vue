@@ -1,12 +1,14 @@
 <template>
   <div class="order-page" @click="clickPage">
+    <choiceCityComHead title="填写订单信息" style="border-bottom:1px solid #CFCFCF"></choiceCityComHead>
+    <carDetails></carDetails>
     <!-- ==============================填写驾驶人信息============================================= -->
     <div class="fill-in-modol">
       <div class="fill-in-driversMessage-title form-group">
         <span>驾驶人信息</span>
         <span class="spancolor-hui">驾驶员姓名须与驾照、护照拼音/英文一致</span>
         <img
-          src="../assets/images/driversicon.png"
+          src="@/assets/images/driversicon.png"
           v-if="$store.state.isLogined"
           alt
           @click="openDriver"
@@ -18,7 +20,7 @@
         v-if="!$store.state.isLogined"
       >
         <span>选择常用驾驶人</span>
-        <img src="../assets/images/select.png" alt>
+        <img src="@/assets/images/select.png" alt>
         <span class="notLogged">登录后可选择常用驾驶人</span>
       </div>
       <div class="form-group">
@@ -28,6 +30,8 @@
           v-model="fillInInfo.name"
           class="form-control"
           placeholder="英文名或拼音*"
+          onkeyup="value=value.replace(/[^a-zA-Z]/g,'')"
+          style="text-transform:Uppercase"
         >
       </div>
       <div class="form-group">
@@ -37,11 +41,13 @@
           v-model="fillInInfo.surname"
           class="form-control"
           placeholder="英文姓或拼音*"
+          onkeyup="value=value.replace(/[^a-zA-Z]/g,'')"
+          style="text-transform:Uppercase"
         >
       </div>
       <div class="form-group age-group" @click.stop="openAge">
-        <span>年龄*</span>
-        <span>{{this.fillInInfo.age}}</span>
+        <span v-if="!fillInInfo.age">年龄*</span>
+        <span class="age-span">{{this.fillInInfo.age}}</span>
         <img src="@/assets/images/select.png" alt>
         <div v-if="isOpenAge">
           <ul>
@@ -51,37 +57,102 @@
           </ul>
         </div>
       </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          v-model="fillInInfo.email"
+          placeholder="Email(用于接受确认单邮件)*"
+        >
+      </div>
+      <div class="form-group code-group">
+        <p @click.stop="openCode" class="codeP">
+          +
+          <input type="text" v-model="fillInInfo.areacode" disabled>
+          <img src="@/assets/images/bot-jiao.png" :class="{'detailsinverse':isOpenCode}" alt>
+        </p>
+        <input
+          type="text"
+          class="form-control tel-input"
+          v-model="fillInInfo.phone"
+          placeholder="电话(用于接受订单信息及紧急信息)*"
+          onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')"
+        >
+        <div style="clear:both"></div>
+        <div v-if="isOpenCode" class="code-list-box">
+          <ul>
+            <li v-for="(item,index) in codeList" :key="index" @click.stop="changeCode(item)">
+              <span>{{item.cnName}}</span>
+              <span>+{{item.mobileCode}}</span>
+              <div style="clear:both"></div>
+            </li>
+          </ul>
+        </div>
+      </div>
       <div class="fill-in-driversMessage-tips form-group" @click="openDeatils">
         <span>如填写更多详细信息，请点击展开</span>
         <img src="@/assets/images//bot-jiao.png" :class="{'imginverse':isDetailsShow}" alt>
       </div>
       <collapseTransition>
         <div v-if="isDetailsShow" class="details-box">
-          <div class="form-group">
+          <div class="form-group gold-group">
             <input
               type="text"
               class="form-control"
-              v-model="fillInInfo.email"
-              placeholder="Email(用于接受确认单邮件)*"
+              v-model="fillInInfo.goldcardnum"
+              placeholder="Hertz金卡号"
+            >
+            <span class="special" @click.stop="gotoGold">注册成为Hertz金卡</span>
+          </div>
+          <div class="form-group age-group" @click.stop="openAir">
+            <span v-if="!fillInInfo.airlinecompany">航空公司</span>
+            <span class="age-span">{{this.fillInInfo.airlinecompany}}</span>
+            <img src="@/assets/images/bot-jiao.png" :class="{'detailsinverse':isOpenAir}" alt>
+            <div v-if="isOpenAir">
+              <ul>
+                <li
+                  v-for="(item,index) in airList"
+                  :key="index"
+                  @click.stop="changeAir(item)"
+                >{{item.title}}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              name
+              v-model="fillInInfo.passengernum"
+              class="form-control"
+              placeholder="常旅客号"
             >
           </div>
-          <div class="form-group code-group">
-            <p @click.stop="openCode" class="codeP">
-              +
-              <input type="text" v-model="fillInInfo.areacode" disabled>
-              <img src="@/assets/images/bot-jiao.png" :class="{'detailsinverse':isOpenCode}" alt>
-            </p>
 
+          <div class="form-group code-group">
+            <p @click.stop="opencontactCode" class="codeP">
+              +
+              <input type="text" v-model="fillInInfo.emergencycontactcode" disabled>
+              <img
+                src="@/assets/images/bot-jiao.png"
+                :class="{'detailsinverse':isOpencontactCode}"
+                alt
+              >
+            </p>
             <input
               type="text"
               class="form-control tel-input"
-              v-model="fillInInfo.phone"
-              placeholder="电话(用于接受订单信息及紧急信息)*"
+              v-model="fillInInfo.emergencycontacttel"
+              placeholder="电话(便于紧急情况下联系)"
+              onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')"
             >
             <div style="clear:both"></div>
-            <div v-if="isOpenCode" class="code-list-box">
+            <div v-if="isOpencontactCode" class="code-list-box">
               <ul>
-                <li v-for="(item,index) in codeList" :key="index" @click.stop="changeCode(item)">
+                <li
+                  v-for="(item,index) in codeList"
+                  :key="index"
+                  @click.stop="changecontactCode(item)"
+                >
                   <span>{{item.cnName}}</span>
                   <span>+{{item.mobileCode}}</span>
                   <div style="clear:both"></div>
@@ -94,7 +165,7 @@
       <div
         class="save-btn"
         @click="saveDriver"
-        v-if="$store.state.isLogined&&(isModifyN||isModifyS||isModifyA||isModifyE||isModifyAR||isModifyP)"
+        v-if="$store.state.isLogined&&(isModifyN||isModifyS||isModifyA||isModifyE||isModifyAR||isModifyP||isModifyG||isModifyAIR||isModifyPA||isModifyEM||isModifyEME)"
       >保存驾驶人至常用驾驶人</div>
     </div>
     <!-- ==============================填写航班信息============================================= -->
@@ -107,7 +178,7 @@
           type="text"
           name
           class="form-control"
-          v-model="fillInInfo.airlinecompany"
+          v-model="fillInInfo.airlinecode"
           placeholder="到达航班号（方便为您预留车辆）"
         >
       </div>
@@ -216,7 +287,7 @@
             </span>
           </p>
           <ul class="insurance-ul">
-            <li v-if="isReturnfare">异地还车</li>
+            <li v-if="isReturnfare">异地还车费</li>
             <li v-if="rateParams.portablegps>0">GPS</li>
             <li v-if="rateParams.infantchildseat>0">婴儿座椅 X {{rateParams.infantchildseat}}</li>
             <li v-if="rateParams.childtoddlerseat>0">幼儿座椅 X {{rateParams.childtoddlerseat}}</li>
@@ -237,7 +308,7 @@
           <p class="discount-info" v-if="counpon.pcgu">{{counpon.pcgu}}</p>
         </div>
         <div class="youhuiMessage last-div">
-          <p v-if="priceInfo.befortotal>0">
+          <p v-if="counpon.discountgu||counpon.fulldiscountgu||counpon.cdpgu||counpon.pcgu">
             <span>优惠前价格</span>
             <span
               style="text-decoration: line-through;color:#9EA3AA"
@@ -295,37 +366,46 @@
   </div>
 </template>
 <script>
-import orderApi from "../api/orderCompletion.js";
+import orderApi from "@/api/orderCompletion.js";
 import collapseTransition from "@/assets/js/collapse";
-import couponPage from "@/components/coupon";
+import couponPage from "@/components/fillInOrder/coupon";
+import carDetails from "@/components/common/carDetails";
+import choiceCityComHead from "@/components/common/choiceCityComHead";
+import { common } from "@/assets/mixin/common";
+
 export default {
   components: {
     collapseTransition,
-    couponPage
+    couponPage,
+    carDetails,
+    choiceCityComHead
   },
+  mixins: [common],
   data() {
     return {
-      // TDES.encrypt(asdasd)     //post 发送数据的时候隐藏参数 用到的方法
       codeList: [], //获取国际区号列表
       phoneVerification: null, //手机号验证正则
+      phoneVerifications: null, //常用联系人手机号码验证正则
       fillInInfo: {
         guid: "", //常用驾驶人guid
         age: "", //年龄
         airlinecompany: "", //航空公司名称
-        airlinecode: " ", //航空公司代码
+        airlinecode: "", //航空公司代码
         areacode: "", //区号
         email: "", //邮箱
-        emergencycontactname: "  ", //联系人姓名
+        emergencycontactname: "", //联系人姓名
         emergencycontacttel: "", //联系人电话
         emergencycontactcode: "", //联系人电话区号
-        goldcardnum: " ", //金卡号
+        goldcardnum: "", //金卡号
         name: "", //名字
         passengernum: "", //常旅客号
         phone: "", //电话
         surname: "" //姓
       },
       isOpenAge: false,
+      isOpenAir: false,
       isOpenCode: false, //国际区号列表
+      isOpencontactCode: false, //紧急联系人国际区号
       elastic: false, //弹框
       driverListShow: false, //驾驶人列表
       costBoxShow: false, //费用明细弹框
@@ -338,8 +418,13 @@ export default {
       isModifyS: true,
       isModifyA: true,
       isModifyE: true,
-      isModifyAR: true,
+      isModifyAR: true, //区号是否修改
       isModifyP: true,
+      isModifyG: false,
+      isModifyAIR: false,
+      isModifyPA: false,
+      isModifyEM: false,
+      isModifyEME: false,
       modifyIndex: "",
       rateParams: {
         //获取价格信息的参数
@@ -376,7 +461,11 @@ export default {
       },
       number: "", //已选中几张优惠券
       couponCode: "", //优惠券代码
-      noUsedTps: false //优惠券代码不可用提示
+      noUsedTps: false, //优惠券代码不可用提示
+      airList: [], //航空公司列表
+      isNext: true, //是否可以下一步  防止重复提交
+      isSave: true, //保存常用联系人 防止重复提交
+      loadingNum: 0
     };
   },
   computed: {
@@ -384,7 +473,7 @@ export default {
       return this.fillInInfo.name;
     },
     surname() {
-      return this.fillInInfo.surname;
+      return this.fillInInfo.surname.toUpperCase();
     },
     age() {
       return this.fillInInfo.age;
@@ -397,6 +486,25 @@ export default {
     },
     phone() {
       return this.fillInInfo.phone;
+    },
+    // 金卡号
+    goldcardnum() {
+      return this.fillInInfo.goldcardnum;
+    },
+    airlinecompany() {
+      return this.fillInInfo.airlinecompany;
+    },
+    // 常旅客号
+    passengernum() {
+      return this.fillInInfo.passengernum;
+    },
+    // 紧急联系人区号
+    emergencycontactcode() {
+      return this.fillInInfo.emergencycontactcode;
+    },
+    // 紧急联系人电话
+    emergencycontacttel() {
+      return this.fillInInfo.emergencycontacttel;
     }
   },
   watch: {
@@ -453,9 +561,80 @@ export default {
           this.isModifyP = false;
         }
       }
+    },
+    goldcardnum(newValue, oldValue) {
+      if (this.modifyIndex) {
+        if (newValue != this.driverList[this.modifyIndex].phone) {
+          this.isModifyG = true;
+        } else {
+          this.isModifyG = false;
+        }
+      }
+    },
+    airlinecompany(newValue, oldValue) {
+      if (this.modifyIndex) {
+        if (newValue != this.driverList[this.modifyIndex].phone) {
+          this.isModifyAIR = true;
+        } else {
+          this.isModifyAIR = false;
+        }
+      }
+    },
+    passengernum(newValue, oldValue) {
+      if (this.modifyIndex) {
+        if (newValue != this.driverList[this.modifyIndex].phone) {
+          this.isModifyPA = true;
+        } else {
+          this.isModifyPA = false;
+        }
+      }
+    },
+    emergencycontactcode(newValue, oldValue) {
+      if (this.modifyIndex) {
+        if (newValue != this.driverList[this.modifyIndex].phone) {
+          this.isModifyEM = true;
+        } else {
+          this.isModifyEM = false;
+        }
+      }
+    },
+    emergencycontacttel(newValue, oldValue) {
+      if (this.modifyIndex) {
+        if (newValue != this.driverList[this.modifyIndex].phone) {
+          this.isModifyEME = true;
+        } else {
+          this.isModifyEME = false;
+        }
+      }
+    },
+    loadingNum(newValue, oldValue) {
+      if (newValue == 4) {
+        this.$loadingToast.close();
+      }
     }
   },
   methods: {
+    // 跳转注册金卡
+    gotoGold() {
+      window.open("https://www.hertz.cn/rentacar/member/enrollment/skinnyGold");
+    },
+    // 获取航空公司列表
+    getAirLine() {
+      orderApi
+        .getAirLine()
+        .then(res => {
+          if (res.ErrorCode == 0) {
+            this.airList = res.Result;
+          } else {
+            this.messageLayer(res.ErrorMsg);
+          }
+          this.loadingNum++;
+        })
+        .catch(res => {
+          this.airList = [];
+          this.messageLayer("获取航空公司列表失败");
+        });
+    },
     // 取消优惠券
     cancelCoupon(val) {
       switch (val) {
@@ -533,10 +712,62 @@ export default {
               "00000000-0000-0000-0000-000000000000"; //满减
             this.rateParams.cdpguid = "00000000-0000-0000-0000-000000000000";
             this.rateParams.pcguid = "00000000-0000-0000-0000-000000000000";
+
+            // //取车日期
+            this.$store.state.pickupDate = res.Result.pickupdatetime.substring(
+              0,
+              res.Result.pickupdatetime.indexOf("T")
+            );
+
+            // //取车时间
+            this.$store.state.pickupTime = res.Result.pickupdatetime.split(
+              "T"
+            )[1];
+            // //取车周几
+            this.$store.state.pickupdayofweek = res.Result.pickupdayofweek;
+            // //还车日期
+            this.$store.state.reDate = res.Result.returndatetime.split("T")[0];
+            // //还车时间
+            this.$store.state.reTime = res.Result.returndatetime.split("T")[1];
+            // //还车周几
+            this.$store.state.returndayofweek = res.Result.returndayofweek;
+            // //租借天数
+            this.$store.state.dayspan = res.Result.dayspan;
+
+            // //取车地址
+            this.$store.state.picAddress =
+              res.Result.pickuplocation_details.description_location_name;
+            // //还车地址
+            this.$store.state.reAddress =
+              res.Result.returnlocation_details.description_location_name;
+
+            // //车辆图片地址
+            this.$store.state.image_path = res.Result.image_path;
+            // //车辆简介
+            this.$store.state.short_description = res.Result.short_description;
+            // //乘客数量
+            this.$store.state.num_adult_passengers =
+              res.Result.num_adult_passengers;
+            // //大行李数量
+            this.$store.state.num_large_suitcase =
+              res.Result.num_large_suitcase;
+            // //小行李数量
+            this.$store.state.num_small_suitcase =
+              res.Result.num_small_suitcase;
+            // //自动挡手动挡
+            this.$store.state.transmission_type =
+              res.Result.transmission_type == "automatic"
+                ? "automatic"
+                : "手动挡";
+            this.$store.state.carDetails = res.Result;
             this.getrate(); //获取价格信息
+          } else {
+            this.messageLayer(res.ErrorMsg);
           }
         })
-        .catch(res => {});
+        .catch(res => {
+          this.messageLayer("获取保险信息失败");
+        });
     },
     // 优惠券接收组件参数 关闭
     childByshow(data) {
@@ -589,16 +820,23 @@ export default {
       orderApi
         .getCoupon(this.couponParams)
         .then(res => {
-          this.couponList = res.Result;
-          if (this.couponList) {
-            this.aLen =
-              this.couponList.available.group0.length +
-              this.couponList.available.group1.length;
+          this.loadingNum++;
+          if (res.ErrorCode == 0) {
+            this.couponList = res.Result;
+            if (this.couponList) {
+              this.aLen =
+                this.couponList.available.group0.length +
+                this.couponList.available.group1.length;
+            } else {
+              this.aLen = 0;
+            }
           } else {
-            this.aLen = 0;
+            this.messageLayer(res.ErrorMsg);
           }
         })
-        .catch(res => {});
+        .catch(res => {
+          this.messageLayer("获取优惠券信息失败");
+        });
     },
     // 获取价格信息
     getrate() {
@@ -617,32 +855,55 @@ export default {
       orderApi
         .getrate(this.rateParams)
         .then(res => {
+          this.loadingNum++;
           if (res.ErrorCode == 0) {
             this.priceInfo = res.Result;
+          } else {
+            this.messageLayer(res.ErrorMsg);
           }
         })
         .catch(res => {
           this.priceInfo = {};
+          this.messageLayer("获取价格信息失败");
         });
     },
     clickPage() {
       this.isOpenAge = false; //年龄列表
       this.isOpenCode = false; //国际区号列表
+      this.isOpencontactCode = false;
+      this.isOpenAir = false;
     },
     // 获取国际区号列表
     getAreacode() {
       orderApi
         .getAreacode()
         .then(res => {
+          this.loadingNum++;
           this.codeList = res.Result;
           this.fillInInfo.areacode = this.codeList[0].mobileCode;
-          this.phoneVerification = eval(this.codeList[0].Regex);
+          this.fillInInfo.emergencycontactcode = this.codeList[0].mobileCode;
+          this.phoneVerification = eval(
+            this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
+          );
+          this.phoneVerifications = eval(
+            this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
+          );
         })
         .catch(res => {});
     },
     // 打开关闭年龄选择
     openAge() {
       this.isOpenAge = !this.isOpenAge;
+    },
+    // 打开航空公司选择
+    openAir() {
+      this.isOpenAir = !this.isOpenAir;
+    },
+    // 选择航空公司
+    changeAir(val) {
+      this.fillInInfo.airlinecompany = val.title;
+      this.isOpenAir = false;
+      console.log(this.fillInInfo.airlinecompany);
     },
     // 选择年龄
     changeAge(val) {
@@ -657,33 +918,54 @@ export default {
     openCode() {
       this.isOpenCode = !this.isOpenCode;
     },
+    // 打开关闭紧急联系人国际区号列表
+    opencontactCode() {
+      this.isOpencontactCode = !this.isOpencontactCode;
+    },
     // 选择国际区号
     changeCode(item) {
       this.fillInInfo.areacode = item.mobileCode;
-      this.phoneVerification = item.Regex;
+      this.phoneVerification = item.Regex.replace("\\/", "/").replace(
+        "\\/",
+        "/"
+      );
       this.isOpenCode = false;
     },
-
+    // 选择常用联系人国际区号
+    changecontactCode(item) {
+      this.fillInInfo.emergencycontactcode = item.mobileCode;
+      this.phoneVerifications = item.Regex.replace("\\/", "/").replace(
+        "\\/",
+        "/"
+      );
+      this.isOpencontactCode = false;
+    },
     // 获取常用驾驶人列表
     getDriverList() {
       orderApi
         .getDriverList()
         .then(res => {
+          this.loadingNum++;
           this.driverList = res.Result;
         })
         .catch(res => {});
     },
     // 添加常用驾驶人接口
     addDriver(data) {
-      orderApi
-        .addDriver(data)
-        .then(res => {
-          alert("保存成功");
-          this.getDriverList();
-        })
-        .catch(res => {
-          alert("保存失败");
-        });
+      if (this.isSave) {
+        this.isSave = false;
+        orderApi
+          .addDriver(data)
+          .then(res => {
+            this.isSave = true;
+            this.messageLayer("保存成功");
+            this.getDriverList();
+          })
+          .catch(res => {
+            this.messageLayer("保存失败");
+            this.isSave = true;
+          });
+      }
     },
     // 打开驾驶人列表
     openDriver() {
@@ -719,17 +1001,30 @@ export default {
       this.isModifyE = false;
       this.isModifyAR = false;
       this.isModifyP = false;
+      this.isModifyG = false;
+      this.isModifyAIR = false;
+      this.isModifyPA = false;
+      this.isModifyEM = false;
+      this.isModifyEME = false;
       this.modifyIndex = index;
     },
     // 保存驾驶人信息
     saveDriver() {
-      if (!this.fillInInfo.name) return alert("请输入英文名或拼音");
-      if (!this.fillInInfo.surname) return alert("请输入英文姓或拼音");
-      if (!this.fillInInfo.age) return alert("请选择年龄");
-      if (!this.fillInInfo.email) return alert("请输入邮箱");
-      if (!this.fillInInfo.phone) return alert("请输入电话");
-    //   if (!this.phoneVerification.test(this.fillInInfo.phone))
-        // return alert("电话格式错误，请重新输入");
+      if (!this.fillInInfo.name) return this.messageLayer("请输入英文名或拼音");
+      if (!this.fillInInfo.surname)
+        return this.messageLayer("请输入英文姓或拼音");
+      if (!this.fillInInfo.age) return this.messageLayer("请选择年龄");
+      if (!this.fillInInfo.email) return this.messageLayer("请输入邮箱");
+      if (
+        this.fillInInfo.email &&
+        !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
+          this.fillInInfo.email
+        )
+      )
+        return this.messageLayer("邮箱格式错误，请重新输入");
+      if (!this.fillInInfo.phone) return this.messageLayer("请输入电话");
+      if (!this.phoneVerification.test(this.fillInInfo.phone))
+        return this.messageLayer("电话格式错误，请重新输入");
       let data = {
         name: this.fillInInfo.name,
         surname: this.fillInInfo.surname,
@@ -737,8 +1032,8 @@ export default {
         phone: this.fillInInfo.phone,
         airlinecode: this.fillInInfo.airlinecode,
         airlinecompany: this.fillInInfo.airlinecompany,
-        areacitycode: this.fillInInfo.areacode,
-        emergencycontactcode: this.fillInInfo.emergencycontactcode,
+        areacitycode: "+" + this.fillInInfo.areacode,
+        emergencycontactcode: "+" + this.fillInInfo.emergencycontactcode,
         emergencycontactname: this.fillInInfo.emergencycontactname,
         emergencycontacttel: this.fillInInfo.emergencycontacttel,
         goldcardnum: this.fillInInfo.goldcardnum,
@@ -845,9 +1140,13 @@ export default {
                   }
                 }
               }
+            } else {
+              this.messageLayer(res.ErrorMsg);
             }
           })
-          .catch(res => {});
+          .catch(res => {
+            this.messageLayer("验证优惠券代码失效");
+          });
       }
     },
     // 提交订单
@@ -857,15 +1156,38 @@ export default {
         this.costBoxShow = true;
         this.oneClick = false;
       } else {
-        if (!this.fillInInfo.name) return alert("请输入英文名或拼音");
-        if (!this.fillInInfo.surname) return alert("请输入英文姓或拼音");
-        if (!this.fillInInfo.age) return alert("请选择年龄");
-        if (!this.fillInInfo.email) return alert("请输入邮箱");
-        if (!this.fillInInfo.phone) return alert("请输入电话");
-        // if (!this.phoneVerification.test(this.fillInInfo.phone))
-        //   return alert("电话格式错误，请重新输入");
+        if (!this.fillInInfo.name)
+          return this.messageLayer("请输入英文名或拼音");
+        if (!this.fillInInfo.surname)
+          return this.messageLayer("请输入英文姓或拼音");
+        if (!this.fillInInfo.age) return this.messageLayer("请选择年龄");
+        if (!this.fillInInfo.email) return this.messageLayer("请输入邮箱");
+        if (
+          this.fillInInfo.email &&
+          !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
+            this.fillInInfo.email
+          )
+        )
+          return this.messageLayer("邮箱格式错误，请重新输入");
+        if (!this.fillInInfo.phone) return this.messageLayer("请输入电话");
+        if (
+          !this.phoneVerification.test(
+            this.fillInInfo.areacode + this.fillInInfo.phone
+          )
+        )
+          return this.messageLayer("电话格式错误，请重新输入");
         if (this.couponCode) {
           if (this.noUsedTps) return false;
+        }
+        if (this.fillInInfo.emergencycontacttel) {
+          if (
+            !this.phoneVerifications.test(
+              this.fillInInfo.emergencycontactcode +
+                this.fillInInfo.emergencycontacttel
+            )
+          ) {
+            return this.messageLayer("紧急联系人电话格式错误，请重新输入");
+          }
         }
         let data = {
           guid: this.rateParams.guid, //保险 GUID
@@ -876,7 +1198,7 @@ export default {
           driverguid: this.fillInInfo.guid, //常用驾驶人GUID
           email: this.fillInInfo.email, //邮箱
           phonenumber: this.fillInInfo.phone, //联系电话
-          areacitycode: this.fillInInfo.areacode, //国际区号
+          areacitycode: "+" + this.fillInInfo.areacode, //国际区号
           givenname: this.fillInInfo.name, //英文名或拼音
           surname: this.fillInInfo.surname, //英文姓或拼音
           age: this.fillInInfo.age, //年龄
@@ -886,7 +1208,7 @@ export default {
           passengernum: this.fillInInfo.passengernum, //航空公司常旅客号
           emergencycontactname: this.fillInInfo.emergencycontactname, //紧急联系人
           emergencycontacttel: this.fillInInfo.emergencycontacttel, //紧急联系电话
-          emergencycontactcode: this.fillInInfo.emergencycontactcode, //紧急联系电话区号
+          emergencycontactcode: "+" + this.fillInInfo.emergencycontactcode, //紧急联系电话区号
           cardcode: "", //卡类别代码
           cardnumber: "", // 卡号
           cardholderrph: null, // 信用卡cvc
@@ -901,33 +1223,51 @@ export default {
           hotelcode: null, //酒店代码
           referenceid: null //下单唯一标识
         };
-        orderApi
-          .submitOrder(data)
-          .then(res => {
-            if (res.ErrorCode == 0) {
-              if (this.priceInfo.isonline) {
-                // 跳转到在线支付页面
-                this.$router.push({
-                  path: "/orderInfo",
-                  query: { guid: res.Result }
-                });
+        if (this.isNext) {
+          this.isNext = false;
+          this.$loadingTost.show();
+          orderApi
+            .submitOrder(data)
+            .then(res => {
+              this.$loadingToast.close();
+              if (res.ErrorCode == 0) {
+                if (this.priceInfo.isonline) {
+                  // 跳转到在线支付页面
+                  this.$router.push({
+                    path: "/orderInfo",
+                    query: { guid: res.Result }
+                  });
+                } else {
+                  this.$router.push({
+                    path: "/orderInfo",
+                    query: { guid: res.Result }
+                  });
+                }
               } else {
-                this.$router.push({
-                  path: "/orderInfo",
-                  query: { guid: res.Result }
-                });
+                this.messageLayer(res.ErrorMsg);
               }
-            }
-          })
-          .catch(res => {});
+              this.isNext = true;
+              this.$loadingTost.show();
+            })
+            .catch(res => {
+              this.$loadingToast.close();
+              this.isNext = true;
+              this.messageLayer("提交订单失败");
+            });
+        }
       }
     }
   },
   mounted() {
+    this.$loadingToast.show();
+    this.$store.state.takeTransLat = this.$route.query.take.split(",")[0];
+    this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
+    this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
+    this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
+    this.getAirLine(); //航空公司列表
     this.getDriverList(); //获取常用驾驶人列表
     this.getAreacode(); //获取国际区号列表
     this.getvehDetails(); //获取保险信息
-    this.getCoupon(); //获取可用优惠券数量
   }
 };
 </script>
@@ -1111,7 +1451,19 @@ export default {
           background-color: #fff;
         }
         img {
+          width: 0.25rem;
+          height: 0.12rem;
+          vertical-align: middle;
           display: inline-block;
+          margin: 0;
+          transform: rotate(0deg);
+          -webkit-transform: rotate(0deg);
+          transition: transform 0.5s;
+        }
+        .detailsinverse {
+          transform: rotate(180deg);
+          -webkit-transform: rotate(180deg);
+          transition: transform 0.5s;
         }
       }
     }
@@ -1147,6 +1499,9 @@ export default {
       span:nth-child(2) {
         margin-left: 0.2rem;
       }
+      .age-span {
+        color: #333;
+      }
       img {
         margin: 0;
         width: 0.12rem;
@@ -1160,6 +1515,9 @@ export default {
         border: 1px solid #ff9c00;
         height: 1.32rem;
         background: #fff;
+        width: 100%;
+        z-index: 1;
+        overflow-y: scroll;
         ul {
           li {
             padding: 0.1rem 0.08rem;
@@ -1191,6 +1549,25 @@ export default {
       }
     }
     .details-box {
+      .gold-group {
+        position: relative;
+      }
+      .special {
+        position: absolute;
+        font-size: 0.18rem;
+        color: #ff9c00;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+      }
+      .age-group {
+        div {
+          height: 2rem;
+          bottom: -2rem;
+        }
+      }
+
       img {
         width: 0.25rem;
         height: 0.12rem;
@@ -1308,6 +1685,7 @@ export default {
     bottom: 0;
     transform: translateY(100%);
     transition: all 0.3s;
+    opacity: 0;
     .cost-box-title {
       height: 0.95rem;
       line-height: 0.95rem;
@@ -1394,6 +1772,7 @@ export default {
   }
   .shows {
     transform: translateY(-1.57rem);
+    opacity: 1;
   }
   .page-footer {
     position: fixed;
