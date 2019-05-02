@@ -140,6 +140,7 @@ export default {
           phone: "+" + this.sendParams.areacode + this.sendParams.phone,
           guid: this.$route.query.guid
         };
+        this.$loadingToast.show();
         orderApi
           .sendSms(data)
           .then(res => {
@@ -236,6 +237,7 @@ export default {
         textarea:disabled,
         input:disabled {
           background-color: #fff;
+          color: #3b444f;
         }
         img {
           float: right;

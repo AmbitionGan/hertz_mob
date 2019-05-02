@@ -127,7 +127,7 @@
             <p class="discount-info" v-if="details.pc_name">{{details.pc_name}}</p>
           </div>
           <div class="youhuiMessage last-div">
-            <p v-if="details.beforeoffer_pay>0">
+            <p v-if="details.beforeoffer_pay!=details.beforeoffer_pay">
               <span>优惠前价格</span>
               <span
                 style="text-decoration: line-through;color:#9EA3AA"
@@ -277,6 +277,7 @@ export default {
   },
   watch: {
     loadingNum(newValue, oldValue) {
+      console.log(newValue, "???");
       if (newValue == 2) {
         this.$loadingToast.close();
       }
@@ -342,7 +343,8 @@ export default {
       this.$router.push({
         path: "/cancelReserve",
         query: {
-          guid: this.details.guid
+          guid: this.details.guid,
+          time: this.details.pickup_datetime.replace("T", "")
         }
       });
     },

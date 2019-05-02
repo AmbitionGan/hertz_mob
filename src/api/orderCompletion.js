@@ -79,7 +79,7 @@ const indexApi = {
   },
   // 提交订单
   submitOrder(params) {
-    return Http.post(apiUrl.submitOrder, encryption(params));
+    return Http.post(apiUrl.submitOrder, params);
   },
   // 取消订单
   cancelOrder(params) {

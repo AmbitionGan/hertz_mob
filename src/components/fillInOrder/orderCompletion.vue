@@ -224,14 +224,14 @@
         <input
           type="text"
           name
-          v-if="number<2"
+          v-if="number<2&&$store.state.isLogined"
           class="form-control discount-code"
           placeholder="优惠券代码"
           v-model="couponCode"
           @blur="testCoupon"
         >
         <p class="no-used" v-show="noUsedTps">优惠券代码不可用</p>
-        <div class="locked" v-if="number==2">
+        <div class="locked" v-if="number==2&&!$store.state.isLogined">
           <img src="@/assets/images/locked.png" alt>
         </div>
       </div>
@@ -608,6 +608,7 @@ export default {
       }
     },
     loadingNum(newValue, oldValue) {
+      console.log(newValue);
       if (newValue == 4) {
         this.$loadingToast.close();
       }
@@ -705,7 +706,9 @@ export default {
               "T",
               ""
             ); //还车时间
-            this.getCoupon(); //获取优惠券信息
+            if (this.$store.state.isLogined) {
+              this.getCoupon(); //获取优惠券信息
+            }
             this.rateParams.discountguid =
               "00000000-0000-0000-0000-000000000000"; //打折
             this.rateParams.fulldiscountguid =
@@ -718,7 +721,7 @@ export default {
               0,
               res.Result.pickupdatetime.indexOf("T")
             );
-
+            // debugger;
             // //取车时间
             this.$store.state.pickupTime = res.Result.pickupdatetime.split(
               "T"
@@ -733,7 +736,9 @@ export default {
             this.$store.state.returndayofweek = res.Result.returndayofweek;
             // //租借天数
             this.$store.state.dayspan = res.Result.dayspan;
-
+            this.$store.state.detailBrands = pubMethod.getBrandLogo(
+              res.Result.pickuplocation_details.brands
+            ).images;
             // //取车地址
             this.$store.state.picAddress =
               res.Result.pickuplocation_details.description_location_name;
@@ -820,7 +825,7 @@ export default {
       orderApi
         .getCoupon(this.couponParams)
         .then(res => {
-          this.loadingNum++;
+          // this.loadingNum++;
           if (res.ErrorCode == 0) {
             this.couponList = res.Result;
             if (this.couponList) {
@@ -903,7 +908,6 @@ export default {
     changeAir(val) {
       this.fillInInfo.airlinecompany = val.title;
       this.isOpenAir = false;
-      console.log(this.fillInInfo.airlinecompany);
     },
     // 选择年龄
     changeAge(val) {
@@ -925,18 +929,16 @@ export default {
     // 选择国际区号
     changeCode(item) {
       this.fillInInfo.areacode = item.mobileCode;
-      this.phoneVerification = item.Regex.replace("\\/", "/").replace(
-        "\\/",
-        "/"
+      this.phoneVerification = eval(
+        item.Regex.replace("\\/", "/").replace("\\/", "/")
       );
       this.isOpenCode = false;
     },
     // 选择常用联系人国际区号
     changecontactCode(item) {
       this.fillInInfo.emergencycontactcode = item.mobileCode;
-      this.phoneVerifications = item.Regex.replace("\\/", "/").replace(
-        "\\/",
-        "/"
+      this.phoneVerifications = eval(
+        item.Regex.replace("\\/", "/").replace("\\/", "/")
       );
       this.isOpencontactCode = false;
     },
@@ -1195,7 +1197,9 @@ export default {
           childtoddlerseat: this.rateParams.childtoddlerseat, //幼儿座椅
           boosterseat: this.rateParams.boosterseat, //儿童座椅
           portablegps: this.rateParams.portablegps, //GPS
-          driverguid: this.fillInInfo.guid, //常用驾驶人GUID
+          driverguid: this.fillInInfo.guid
+            ? this.fillInInfo.guid
+            : "00000000-0000-0000-0000-000000000000", //常用驾驶人GUID
           email: this.fillInInfo.email, //邮箱
           phonenumber: this.fillInInfo.phone, //联系电话
           areacitycode: "+" + this.fillInInfo.areacode, //国际区号
@@ -1225,7 +1229,7 @@ export default {
         };
         if (this.isNext) {
           this.isNext = false;
-          this.$loadingTost.show();
+          this.$loadingToast.show();
           orderApi
             .submitOrder(data)
             .then(res => {
@@ -1234,20 +1238,28 @@ export default {
                 if (this.priceInfo.isonline) {
                   // 跳转到在线支付页面
                   this.$router.push({
-                    path: "/orderInfo",
-                    query: { guid: res.Result }
+                    path: "/onlinePay",
+                    query: {
+                      guid: res.Result,
+                      take: this.$route.query.take,
+                      ret: this.$route.query.ret
+                    }
                   });
                 } else {
                   this.$router.push({
                     path: "/orderInfo",
-                    query: { guid: res.Result }
+                    query: {
+                      guid: res.Result,
+                      take: this.$route.query.take,
+                      ret: this.$route.query.ret
+                    }
                   });
                 }
               } else {
                 this.messageLayer(res.ErrorMsg);
               }
               this.isNext = true;
-              this.$loadingTost.show();
+              this.$loadingToast.close();
             })
             .catch(res => {
               this.$loadingToast.close();
@@ -1441,7 +1453,7 @@ export default {
         border-bottom: 1px solid #cecece;
         font-size: 0.24rem;
         input {
-          color: #707275;
+          // color: #707275;
           font-size: 0.24rem;
           display: inline-block;
           width: 46%;
@@ -1449,6 +1461,7 @@ export default {
         textarea:disabled,
         input:disabled {
           background-color: #fff;
+          color: #3b444f;
         }
         img {
           width: 0.25rem;
