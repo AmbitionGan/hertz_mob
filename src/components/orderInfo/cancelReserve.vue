@@ -1,5 +1,6 @@
 <template>
   <div class="cancel-page" @click="clickClose">
+    <choiceCityComHead title="取消预定"></choiceCityComHead>
     <div class="cancel-content">
       <div class="content-group">
         <p class="group-p">取消原因</p>
@@ -33,7 +34,13 @@
 </template>
 <script>
 import orderApi from "@/api/orderCompletion.js";
+import choiceCityComHead from "@/components/common/choiceCityComHead"; //顶部
+import { common } from "@/assets/mixin/common";
 export default {
+  components: {
+    choiceCityComHead
+  },
+  mixins: [common],
   data() {
     return {
       isOpenBox: false,
@@ -42,7 +49,8 @@ export default {
         why: "", //取消原因
         email: "", //订单邮箱
         guid: ""
-      }
+      },
+      isCancel: true //防止重复提交
     };
   },
   methods: {
@@ -62,27 +70,35 @@ export default {
     noCancel() {},
     // 确认取消
     sureCancel() {
-      if (!this.cancelForm.why) return alert("请选择取消原因");
-      if (!this.cancelForm.email) return alert("请填写订单邮箱");
+      if (!this.cancelForm.why) return this.messageLayer("请选择取消原因");
+      if (!this.cancelForm.email) return this.messageLayer("请填写订单邮箱");
       if (
         !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
           this.cancelForm.email
         )
       )
-        return alert("邮箱格式错误，请重新输入");
-      orderApi
-        .cancelOrder(this.cancelForm)
-        .then(res => {
-          if (res.ErrorCode == 0) {
-            this.$router.push({
-              path: "/orderInfo",
-              query: { guid: res.Result }
-            });
-          }
-        })
-        .catch(res => {
-          alert(res.ErrorMsg);
-        });
+        return this.messageLayer("邮箱格式错误，请重新输入");
+      if (this.isCancel) {
+        this.isCancel = false;
+        this.$loadingToast.show();
+        orderApi
+          .cancelOrder(this.cancelForm)
+          .then(res => {
+            this.$loadingToast.close();
+            if (res.ErrorCode == 0) {
+              this.$router.push({
+                path: "/orderInfo",
+                query: { guid: res.Result }
+              });
+            }
+            this.isCancel = true;
+          })
+          .catch(res => {
+            this.$loadingToast.close();
+            this.messageLayer(res.ErrorMsg);
+            this.isCancel = true;
+          });
+      }
     }
   },
   mounted() {}

@@ -1,5 +1,6 @@
 <template>
   <div class="send-page" @click.stop="closeBox">
+    <choiceCityComHead title="发送确认单"></choiceCityComHead>
     <div class="page-content">
       <div class="content-group">
         <p class="group-p">发送至邮箱</p>
@@ -43,7 +44,13 @@
 </template>
 <script>
 import orderApi from "@/api/orderCompletion.js";
+import choiceCityComHead from "@/components/common/choiceCityComHead"; //顶部
+import { common } from "@/assets/mixin/common";
 export default {
+  components: {
+    choiceCityComHead
+  },
+  mixins: [common],
   data() {
     return {
       sendParams: {
@@ -53,10 +60,12 @@ export default {
       },
       isOpenCode: false, //区号列表显隐
       codeList: [], //国际区号列表
-      phoneVerification: null //手机号正则验证
+      phoneVerification: null, //手机号正则验证
+      isSend: true //防止重复提交
     };
   },
   mounted() {
+    this.$loadingToast.show();
     this.getAreacode(); //获取国际区号列表
   },
   methods: {
@@ -69,13 +78,21 @@ export default {
       orderApi
         .getAreacode()
         .then(res => {
-          this.codeList = res.Result;
-          this.sendParams.areacode = this.codeList[0].mobileCode;
-          this.phoneVerification = eval(
-            this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
-          );
+          if (res.ErrorCode == 0) {
+            this.codeList = res.Result;
+            this.sendParams.areacode = this.codeList[0].mobileCode;
+            this.phoneVerification = eval(
+              this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
+            );
+          } else {
+            this.messageLayer(res.ErrorMsg);
+          }
+          this.$loadingToast.show();
         })
-        .catch(res => {});
+        .catch(res => {
+          this.$loadingToast.show();
+          this.messageLayer("获取国际区号列表失败");
+        });
     },
     // 打开关闭国际区号列表
     openCode() {
@@ -91,53 +108,68 @@ export default {
     },
     // 发送邮箱接口
     sendEmail() {
-      let data = {
-        email: this.sendParams.email,
-        guid: this.$route.query.guid
-      };
-      orderApi
-        .sendEmail(data)
-        .then(res => {
-          if (res.ErrorMsg == 0) {
-            alert("邮箱发送成功");
-          } else {
-            alert(res.ErrorMsg);
-          }
-        })
-        .catch(err => {
-          alert(err.ErrorMsg);
-        });
+      if (this.isSend) {
+        this.isSend = false;
+        let data = {
+          email: this.sendParams.email,
+          guid: this.$route.query.guid
+        };
+        orderApi
+          .sendEmail(data)
+          .then(res => {
+            if (res.ErrorMsg == 0) {
+              this.messageLayer("邮箱发送成功");
+            } else {
+              this.messageLayer(res.ErrorMsg);
+            }
+            this.isSend = true;
+            this.$loadingToast.close();
+          })
+          .catch(err => {
+            this.$loadingToast.close();
+            this.messageLayer("邮箱发送失败");
+            this.isSend = true;
+          });
+      }
     },
     // 发送邮箱接口
     sendSms() {
-      let data = {
-        phone: "+" + this.sendParams.areacode + this.sendParams.phone,
-        guid: this.$route.query.guid
-      };
-      orderApi
-        .sendSms(data)
-        .then(res => {
-          if (res.ErrorMsg == 0) {
-            alert("手机短信发送成功");
-          } else {
-            alert(res.ErrorMsg);
-          }
-        })
-        .catch(err => {
-          alert(err.ErrorMsg);
-        });
+      if (this.isSend) {
+        this.isSend = false;
+        let data = {
+          phone: "+" + this.sendParams.areacode + this.sendParams.phone,
+          guid: this.$route.query.guid
+        };
+        orderApi
+          .sendSms(data)
+          .then(res => {
+            if (res.ErrorMsg == 0) {
+              this.messageLayer("手机短信发送成功");
+            } else {
+              this.messageLayer(res.ErrorMsg);
+            }
+            this.isSend = true;
+            this.$loadingToast.close();
+          })
+          .catch(err => {
+            this.$loadingToast.close();
+            this.isSend = true;
+            this.messageLayer("手机短信发送失败");
+          });
+      }
     },
     // 确认发送
     sureSend() {
       if (!this.sendParams.email && !this.sendParams.phone)
-        return alert("请输入邮箱或区号和电话");
+        return this.messageLayer("请输入邮箱或区号和电话");
       if (this.sendParams.email && !this.sendParams.phone) {
         if (
           !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
             this.sendParams.email
           )
         )
-          return alert("邮箱格式错误，请重新输入");
+          return this.messageLayer("邮箱格式错误，请重新输入");
+        this.$loadingToast.show();
         this.sendEmail();
       }
       if (!this.sendParams.email && this.sendParams.phone) {
@@ -146,8 +178,9 @@ export default {
             this.sendParams.areacode + this.sendParams.phone
           )
         ) {
-          alert("电话格式错误，请重新输入");
+          this.messageLayer("电话格式错误，请重新输入");
         } else {
+          this.$loadingToast.show();
           this.sendSms();
         }
       }
@@ -157,8 +190,9 @@ export default {
             this.sendParams.areacode + this.sendParams.phone
           )
         ) {
-          alert("电话格式错误，请重新输入");
+          this.messageLayer("电话格式错误，请重新输入");
         } else {
+          this.$loadingToast.show();
           this.sendSms();
         }
         this.sendEmail();

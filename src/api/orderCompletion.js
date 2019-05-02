@@ -42,7 +42,9 @@ const apiUrl = {
   // 手机短信发送
   sendSms: "/order/send/sms/",
   //查看航空公司列表
-  getAirLine: "/airline/"
+  getAirLine: "/airline/",
+  // 查询订单车辆信息
+  getCardetails: "/order/detail/vehicle/?guid="
 };
 
 /**
@@ -89,7 +91,7 @@ const indexApi = {
   },
   // 获取价格信息
   getrate(params) {
-    return Http.post(apiUrl.rate, encryption(params));
+    return Http.post(apiUrl.rate, params);
   },
   // 获取保险信息
   getvehDetails(params) {
@@ -110,6 +112,10 @@ const indexApi = {
   //查看航空公司列表
   getAirLine() {
     return Http.get(apiUrl.getAirLine);
+  },
+  // 查询订单车辆信息
+  getCardetails(params) {
+    return Http.get(apiUrl.getCardetails + params);
   }
 };
 

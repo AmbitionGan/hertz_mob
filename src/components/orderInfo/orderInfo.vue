@@ -1,5 +1,7 @@
 <template>
   <div class="orderInfo-page">
+    <choiceCityComHead title="订单信息"></choiceCityComHead>
+    <carDetails></carDetails>
     <!-- ============================待支付==================================== -->
     <div class="info-page-title" v-if="details.order_status=='WaitPay'&&timeOut==false">
       <div class="title-info">
@@ -82,7 +84,7 @@
               <li v-for="(item,index) in details.details_qualifier.split(',')" :key="index">{{item}}</li>
             </ul>
           </div>
-          <div>
+          <div v-if="priceInfo.offline_pay>0">
             <p>
               <span>到店支付包含</span>
               <span>
@@ -107,10 +109,13 @@
               >{{items}}</li>
             </ul>
           </div>
-          <div>
+          <div v-if="priceInfo.offline_pay>0">
             <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
           </div>
-          <div class="youhuiMessage">
+          <div
+            class="youhuiMessage"
+            v-if="details.discount_name||details.full_discountname||details.cdp_name||details.pc_name"
+          >
             <p>优惠信息</p>
             <!--打折优惠名称 -->
             <p class="discount-info" v-if="details.discount_name">{{details.discount_name}}</p>
@@ -122,13 +127,13 @@
             <p class="discount-info" v-if="details.pc_name">{{details.pc_name}}</p>
           </div>
           <div class="youhuiMessage last-div">
-            <p>
+            <p v-if="details.beforeoffer_pay>0">
               <span>优惠前价格</span>
               <span
                 style="text-decoration: line-through;color:#9EA3AA"
               >{{details.beforeoffer_currency}}&nbsp;{{details.beforeoffer_pay}}</span>
             </p>
-            <p class>
+            <p v-if="details.total_pay>0">
               <span>订单总额</span>
               <span class="origin">
                 {{details.total_currency}}
@@ -245,10 +250,17 @@
 <script>
 import orderApi from "@/api/orderCompletion.js";
 import collapseTransition from "@/assets/js/collapse";
+import choiceCityComHead from "@/components/common/choiceCityComHead"; //顶部
+import carDetails from "@/components/common/carDetails";
+import logos from "@/assets/js/common";
+import { common } from "@/assets/mixin/common";
 export default {
   components: {
-    collapseTransition
+    collapseTransition,
+    choiceCityComHead,
+    carDetails
   },
+  mixins: [common],
   data() {
     return {
       details: {}, //订单详情
@@ -259,10 +271,63 @@ export default {
       showsBoxDriver: false,
       showsBoxHints: false,
       showsBoxPrompt: false,
-      surplusTime: ""
+      surplusTime: "",
+      loadingNum: 0
     };
   },
+  watch: {
+    loadingNum(newValue, oldValue) {
+      if (newValue == 2) {
+        this.$loadingToast.close();
+      }
+    }
+  },
   methods: {
+    // 获取订单车辆信息
+    getCardetails() {
+      orderApi
+        .getCardetails(this.$route.query.guid)
+        .then(res => {
+          if (res.ErrorCode == 0) {
+            if (res.Result[0]) {
+              this.$store.state.detailBrands = logos.getBrandLogo(
+                res.Result[0].brands
+              );
+              // //取车地址
+              this.$store.state.picAddress =
+                res.Result[0].pickuplocation_details.description_location_name;
+              // //还车地址
+              this.$store.state.reAddress =
+                res.Result[0].returnlocation_details.description_location_name;
+
+              // //车辆图片地址
+              this.$store.state.image_path = res.Result[0].image_path;
+              // //车辆简介
+              this.$store.state.short_description =
+                res.Result[0].short_description;
+              // //乘客数量
+              this.$store.state.num_adult_passengers =
+                res.Result[0].num_adult_passengers;
+              // //大行李数量
+              this.$store.state.num_large_suitcase =
+                res.Result[0].num_large_suitcase;
+              // //小行李数量
+              this.$store.state.num_small_suitcase =
+                res.Result[0].num_small_suitcase;
+              // //自动挡手动挡
+              this.$store.state.transmission_type =
+                res.Result[0].transmission_type == 1 ? "automatic" : "手动挡";
+              this.$store.state.carDetails = res.Result[0];
+            }
+          } else {
+            this.messageLayer(res.ErrorMsg);
+          }
+          loadingNum++;
+        })
+        .catch(err => {
+          this.messageLayer("获取订单车辆信息失败");
+        });
+    },
     // 立即支付
     payment() {
       this.$router.push({
@@ -287,17 +352,23 @@ export default {
     },
     // 删除订单
     deleteOrder() {
+      this.$loadingToast.show();
       orderApi
-        .delOrder()
+        .delOrder(this.$route.query.guid)
         .then(res => {
+          this.$loadingToast.close();
           if (res.ErrorCode == 0) {
-            alert("删除成功");
+            this.messageLayer("删除成功");
+            setTimeout(() => {
+              this.$router.push("/");
+            }, 1000);
           } else {
-            alert("删除失败");
+            this.messageLayer("删除失败");
           }
         })
         .catch(res => {
-          alert("删除失败");
+          this.$loadingToast.close();
+          this.messageLayer("删除失败");
         });
     },
     // 重新选车
@@ -340,20 +411,56 @@ export default {
       orderApi
         .orderDetail(this.$route.query.guid)
         .then(res => {
-          this.details = res.Result[0];
-          this.serverDate(); //获取服务器时间
+          if (res.ErrorCode == 0) {
+            this.details = res.Result[0];
+            // //取车日期
+            this.$store.state.pickupDate = this.details.pickup_datetime.substring(
+              0,
+              this.details.pickup_datetime.indexOf("T")
+            );
+            // //取车时间
+            this.$store.state.pickupTime = this.details.pickup_datetime.split(
+              "T"
+            )[1];
+            // //取车周几
+            this.$store.state.pickupdayofweek = this.details.pickup_week;
+            // //还车日期
+            this.$store.state.reDate = this.details.return_datetime.split(
+              "T"
+            )[0];
+            // //还车时间
+            this.$store.state.reTime = this.details.return_datetime.split(
+              "T"
+            )[1];
+            // //还车周几
+            this.$store.state.returndayofweek = this.details.return_week;
+            // //租借天数
+            this.$store.state.dayspan = this.details.usecar_time;
+            this.serverDate(); //获取服务器时间
+          } else {
+            this.messageLayer(res.ErrorMsg);
+          }
+          loadingNum++;
         })
-        .catch(res => {});
+        .catch(res => {
+          this.messageLayer("获取订单详情失败");
+        });
     },
     // 获取服务器时间
     serverDate() {
       orderApi
         .serverDate()
         .then(res => {
-          this.serverTime = res.Result;
-          this.countTimeDiff();
+          if (res.ErrorCode == 0) {
+            this.serverTime = res.Result;
+            this.countTimeDiff();
+          } else {
+            this.messageLayer(res.ErrorMsg);
+          }
         })
-        .catch(res => {});
+        .catch(res => {
+          this.messageLayer("获取服务器时间失败");
+        });
     },
     countTimeDiff() {
       let time1 = new Date(this.serverTime).getTime(); //服务器时间
@@ -363,7 +470,7 @@ export default {
       this.surplusTime = considerTime - difference;
       if (this.surplusTime <= 0) {
         this.timeOut = true;
-        // alert('超时')
+        // this.messageLayer('超时')
       } else {
         this.countTime();
       }
@@ -382,7 +489,7 @@ export default {
       this.timetoPay = dates; //待支付时间
       if (this.surplusTime < 1000) {
         this.timeOut = true;
-        // alert('已超时')
+        // this.messageLayer('已超时')
       } else {
         this.timeOut = false;
         this.surplusTime -= 1000;
@@ -393,14 +500,19 @@ export default {
     }
   },
   mounted() {
+    this.$loadingToast.show();
+    this.$store.state.takeTransLat = this.$route.query.take.split(",")[0];
+    this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
+    this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
+    this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
     this.orderDetail(); //获取订单详情
+    this.getCardetails(); //获取订单车辆信息
   }
 };
 </script>
 <style lang="less" scoped>
 .orderInfo-page {
   background: #f3f3f5;
-  padding-top: 0.4rem;
   .titleCharges {
     border-bottom: 1px solid #cecece;
     padding: 0 0.41rem 0 0.42rem;

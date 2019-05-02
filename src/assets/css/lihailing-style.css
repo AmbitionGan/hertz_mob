@@ -68,7 +68,7 @@ button{
 .switch-additionalServices{
 	position: relative;
 }
-.js-switch-blue{
+.js-switch-blue,.js-switch-blue1,.js-switch-blue2,.js-switch-blue3,.js-switch-blue4,.js-switch-blue5{
 	opacity: 0;
     position: absolute;
     left: 0;
@@ -109,7 +109,7 @@ button{
 .form-control{
 	padding: 6px 0;
 	border: none;
-	border-bottom: 1px solid #cecece; 
+	border-bottom: 1px solid #cecece;
 	box-shadow:none;
 	border-radius: 0;
 
@@ -145,7 +145,7 @@ button{
 	display: flex;
 	justify-content: space-around;
 	margin-top: 1.21rem;
-	
+
 }
 .tab_loginLeft,.tab_loginRight{
 	display: flex;
@@ -253,7 +253,7 @@ button{
 }
 /*=========================================================================优惠券=========================================================================*/
 .coupon{
-	
+
 	margin-top: 0.3rem;
 
 }
@@ -272,7 +272,7 @@ button{
 	float: left;
 	text-align: center;
 	background: #fff;
-	
+
 }
 .coupon_ul li a{
 	color: #3b444f;
@@ -294,7 +294,7 @@ button{
 }
 .coupan_p2{
 	font-size: 0.24rem;
-	color: #58595b; 
+	color: #58595b;
 }
 .coupon_btn{
 	width: 1.72rem;
@@ -334,7 +334,7 @@ li.active{
     padding-bottom: 2.8rem;
 }
 .driversForm{
-	
+
 }
 .driversForm .form-group {
 	padding: 0 0.4rem;
@@ -384,14 +384,14 @@ li.active{
 	width: 100%;
 	margin-bottom: 0.21rem;
 	position: relative;
-	
+
 }
 .DriversMessage_modal h3{
 	color:#ffcc00;
 	font-size: 0.45rem;
 	font-weight: 700;
 	margin: 0;
-	
+
 }
 .DriversMessage_modal p{
 	line-height: 0.48rem;
@@ -431,7 +431,7 @@ li.active{
 	width: 50%;
     float: left;
 	text-align: center;
-	
+
 }
 .driversTranslator_ul li a{
 	color: #fff;
@@ -536,7 +536,7 @@ select {
 	  height: 100%;
 	  opacity: 0;
   }
-  
+
   .fileinput-exists .fileinput-new,
   .fileinput-new .fileinput-exists {
 	display: none;
@@ -552,7 +552,7 @@ select {
   .form-control .fileinput-filename {
 	vertical-align: bottom;
   }
-  
+
   .failing{
 	  position: absolute;
 	  right: 0;
@@ -596,7 +596,7 @@ select {
   .securitylistP span{
 	display: block;
   }
-  
+
   .securityCenter li p{
 	margin-left: 0.17rem;
   }
@@ -792,14 +792,14 @@ select {
 	line-height: 0.58rem;
 	text-align: center;
 	border-radius: 0.10rem;
+  background: #6a6b6e;
+  color: #fff;
 }
-.onlinePayment{
+.paymentDiv span.on{
 	background: #ffc500;
 	color: #3b444f;
 }
 .shopPayment{
-	background: #6a6b6e;
-	color: #fff;
 	margin-left: 0.2rem;
 }
 /*=================驾照要求==========================*/
@@ -941,7 +941,7 @@ select {
 	color: #ff9c00!important;
 }
 .listPage-model{
-	padding: 0.3rem 0;
+	padding: 0.3rem 0 0;
 	background: #fff;
 	display: table;
 	width: 100%;
@@ -950,10 +950,11 @@ select {
 .listPage-model-top{
 	display: table;
 	width: 100%;
+  padding-bottom: 0.3rem;
 }
 .listPage-model-left{
-	width: 40%;
-	padding-left: 0.4rem;
+	width: 38%;
+	padding-left: 0.2rem;
 	float:left;
 	text-align: center;
 }
@@ -965,8 +966,9 @@ select {
 	margin-top: 0.11rem;
 }
 .listPage-model-right{
-	width: 56%;
+	width: 62%;
 	float: right;
+  padding-right: 0.2rem;
 
 }
 .splitine{
@@ -989,10 +991,11 @@ select {
 	border:0.02rem solid #cecece;
 	border-radius: 0.3rem;
 	padding: 0.03rem 0.1rem;
-	
+
 }
 
 .listPage-model-price{
+  overflow: hidden;
 	position: relative;
 }
 .listPage-model-price .spanfirst{
@@ -1097,7 +1100,7 @@ select {
 	line-height: 0.58rem;
 	border-radius: 0.1rem;
 	-webkit-box-shadow: 0px 0px 38px 3px #ccc;
-    
+
     box-shadow: 0px 0px 38px 3px #ccc;
 }
 .sieveSetting-reset{
@@ -1109,22 +1112,53 @@ select {
 /*==================隐藏的车辆信息===============*/
 .vehicleInformation{
 	background: #f3f3f4;
-	padding: 0.23rem 0.4rem;
-	margin-top: 0.1rem;
-	display: flex;
+	padding: 0.23rem 0.2rem;
 	justify-content: space-between;
-	display: none;
-
+}
+.vehicleList{
+  display: flex;
+  margin-bottom: 0.2rem;
+  padding-bottom: 0.2rem;
+  border-bottom:1px solid #cecece;
+}
+.vehicleList:last-child{
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 .vehicleInformatio-left{
-	padding: 0.23rem 0.4rem 0.23rem 0;
+	padding: 0.23rem 0.2rem 0.23rem 0;
 	border-right:0.02rem solid #cecece;
 	text-align: center;
+  width:35%;
+}
+.vehicleInformatio-right-box{
+  display: flex;
+  padding-bottom:0.2rem;
+  padding-left: 0.45rem;
+  position: relative;
+}
+.vehicleInformatio-left img{
+
 }
 .vehicleInformatio-right{
-	padding: 0.23rem 0rem 0.23rem 0.4rem;
-	display: flex;
+	padding: 0.23rem 0rem 0.23rem 0.2rem;
 	justify-content: space-between;
+  width:65%;
+
+}
+.vehicleInformatio-right >a{
+  display: inline-block;
+  width: 60px;
+  height: 28px;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 28px;
+  color: #fff;
+  background: #58595b;
+  margin-top: 10px;
+  padding-right: 0px;
+  float:right;
 }
 .category{
 	display: block;
@@ -1134,9 +1168,15 @@ select {
 	margin-right: 0.15rem;
 	text-align: center;
 	line-height: 0.3rem;
+  position: absolute;
+  left:0;
+  top:0;
+}
+.introduction{
+  width:100%;
 }
 .introduction p{
-	margin-bottom: 0.26rem;
+	margin-bottom: 0.16rem;
 	display: table;
     width: 100%;
 }
@@ -1307,7 +1347,7 @@ select {
 	display: inline;
 }
 .message-more a{
-	color: #3b444f; 
+	color: #3b444f;
 }
 /*  ========================================================发送确认订单==========================================================*/
 .sendConfirmation label{
@@ -1354,7 +1394,7 @@ select {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-} 
+}
 .cost-modal-top-left{
 	width: 70%;
 }
@@ -1367,7 +1407,7 @@ select {
 	line-height: 0.84rem;
 	color: #969ca3;
 	font-size: 0.3rem;
-	
+
 }
 .immediatePayment {
 	width: 100%;
@@ -1379,7 +1419,7 @@ select {
 	-moz-border-radius: 0.1rem;
 	-ms-border-radius: 0.1rem;
 	-o-border-radius: 0.1rem;
-	
+
 }
 .unpaidOrder-address{
 	margin-top: 0.2rem;
@@ -1462,7 +1502,7 @@ select {
 }
 .importantReading{
 	margin-bottom: 0.6rem!important;
-	
+
 	position: relative;
 }
 .importantReading p{

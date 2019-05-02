@@ -8,7 +8,7 @@
 
 // 公共方法
 const common = {
-    
+
 }
 
 // 首页方法
@@ -18,6 +18,7 @@ const index = {
         state.isCalendarLoaded = true;
         state.calendar = data
         this.getters.getTakeCarDate
+        this.getters.setDefaulttakeCarDate
         this.getters.setDefaultRetCarDate
     }
 }

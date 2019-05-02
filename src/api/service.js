@@ -7,14 +7,14 @@ import axios from "axios";
  */
 
 switch (process.env.NODE_ENV) {
-  case "development":
-    axios.defaults.baseURL = "/api";
-    break;
-  case "production":
-    axios.defaults.baseURL = window.location.origin + "/api";
-    break;
-  default:
-    break;
+    case 'development':
+        axios.defaults.baseURL = '/api';
+        break;
+    case 'production':
+        axios.defaults.baseURL = window.location.origin + '/api';
+        break;
+    default:
+        break;
 }
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -83,4 +83,4 @@ const service = {
   }
 };
 
-export default service;
+export default service

@@ -1,5 +1,7 @@
 <template>
   <div class="order-page" @click="clickPage">
+    <choiceCityComHead title="填写订单信息" style="border-bottom:1px solid #CFCFCF"></choiceCityComHead>
+    <carDetails></carDetails>
     <!-- ==============================填写驾驶人信息============================================= -->
     <div class="fill-in-modol">
       <div class="fill-in-driversMessage-title form-group">
@@ -367,11 +369,18 @@
 import orderApi from "@/api/orderCompletion.js";
 import collapseTransition from "@/assets/js/collapse";
 import couponPage from "@/components/fillInOrder/coupon";
+import carDetails from "@/components/common/carDetails";
+import choiceCityComHead from "@/components/common/choiceCityComHead";
+import { common } from "@/assets/mixin/common";
+
 export default {
   components: {
     collapseTransition,
-    couponPage
+    couponPage,
+    carDetails,
+    choiceCityComHead
   },
+  mixins: [common],
   data() {
     return {
       codeList: [], //获取国际区号列表
@@ -453,7 +462,10 @@ export default {
       number: "", //已选中几张优惠券
       couponCode: "", //优惠券代码
       noUsedTps: false, //优惠券代码不可用提示
-      airList: [] //航空公司列表
+      airList: [], //航空公司列表
+      isNext: true, //是否可以下一步  防止重复提交
+      isSave: true, //保存常用联系人 防止重复提交
+      loadingNum: 0
     };
   },
   computed: {
@@ -594,6 +606,11 @@ export default {
           this.isModifyEME = false;
         }
       }
+    },
+    loadingNum(newValue, oldValue) {
+      if (newValue == 4) {
+        this.$loadingToast.close();
+      }
     }
   },
   methods: {
@@ -608,10 +625,14 @@ export default {
         .then(res => {
           if (res.ErrorCode == 0) {
             this.airList = res.Result;
+          } else {
+            this.messageLayer(res.ErrorMsg);
           }
+          this.loadingNum++;
         })
         .catch(res => {
           this.airList = [];
+          this.messageLayer("获取航空公司列表失败");
         });
     },
     // 取消优惠券
@@ -691,10 +712,62 @@ export default {
               "00000000-0000-0000-0000-000000000000"; //满减
             this.rateParams.cdpguid = "00000000-0000-0000-0000-000000000000";
             this.rateParams.pcguid = "00000000-0000-0000-0000-000000000000";
+
+            // //取车日期
+            this.$store.state.pickupDate = res.Result.pickupdatetime.substring(
+              0,
+              res.Result.pickupdatetime.indexOf("T")
+            );
+
+            // //取车时间
+            this.$store.state.pickupTime = res.Result.pickupdatetime.split(
+              "T"
+            )[1];
+            // //取车周几
+            this.$store.state.pickupdayofweek = res.Result.pickupdayofweek;
+            // //还车日期
+            this.$store.state.reDate = res.Result.returndatetime.split("T")[0];
+            // //还车时间
+            this.$store.state.reTime = res.Result.returndatetime.split("T")[1];
+            // //还车周几
+            this.$store.state.returndayofweek = res.Result.returndayofweek;
+            // //租借天数
+            this.$store.state.dayspan = res.Result.dayspan;
+
+            // //取车地址
+            this.$store.state.picAddress =
+              res.Result.pickuplocation_details.description_location_name;
+            // //还车地址
+            this.$store.state.reAddress =
+              res.Result.returnlocation_details.description_location_name;
+
+            // //车辆图片地址
+            this.$store.state.image_path = res.Result.image_path;
+            // //车辆简介
+            this.$store.state.short_description = res.Result.short_description;
+            // //乘客数量
+            this.$store.state.num_adult_passengers =
+              res.Result.num_adult_passengers;
+            // //大行李数量
+            this.$store.state.num_large_suitcase =
+              res.Result.num_large_suitcase;
+            // //小行李数量
+            this.$store.state.num_small_suitcase =
+              res.Result.num_small_suitcase;
+            // //自动挡手动挡
+            this.$store.state.transmission_type =
+              res.Result.transmission_type == "automatic"
+                ? "automatic"
+                : "手动挡";
+            this.$store.state.carDetails = res.Result;
             this.getrate(); //获取价格信息
+          } else {
+            this.messageLayer(res.ErrorMsg);
           }
         })
-        .catch(res => {});
+        .catch(res => {
+          this.messageLayer("获取保险信息失败");
+        });
     },
     // 优惠券接收组件参数 关闭
     childByshow(data) {
@@ -747,16 +820,23 @@ export default {
       orderApi
         .getCoupon(this.couponParams)
         .then(res => {
-          this.couponList = res.Result;
-          if (this.couponList) {
-            this.aLen =
-              this.couponList.available.group0.length +
-              this.couponList.available.group1.length;
+          this.loadingNum++;
+          if (res.ErrorCode == 0) {
+            this.couponList = res.Result;
+            if (this.couponList) {
+              this.aLen =
+                this.couponList.available.group0.length +
+                this.couponList.available.group1.length;
+            } else {
+              this.aLen = 0;
+            }
           } else {
-            this.aLen = 0;
+            this.messageLayer(res.ErrorMsg);
           }
         })
-        .catch(res => {});
+        .catch(res => {
+          this.messageLayer("获取优惠券信息失败");
+        });
     },
     // 获取价格信息
     getrate() {
@@ -775,12 +855,16 @@ export default {
       orderApi
         .getrate(this.rateParams)
         .then(res => {
+          this.loadingNum++;
           if (res.ErrorCode == 0) {
             this.priceInfo = res.Result;
+          } else {
+            this.messageLayer(res.ErrorMsg);
           }
         })
         .catch(res => {
           this.priceInfo = {};
+          this.messageLayer("获取价格信息失败");
         });
     },
     clickPage() {
@@ -794,6 +878,7 @@ export default {
       orderApi
         .getAreacode()
         .then(res => {
+          this.loadingNum++;
           this.codeList = res.Result;
           this.fillInInfo.areacode = this.codeList[0].mobileCode;
           this.fillInInfo.emergencycontactcode = this.codeList[0].mobileCode;
@@ -860,21 +945,27 @@ export default {
       orderApi
         .getDriverList()
         .then(res => {
+          this.loadingNum++;
           this.driverList = res.Result;
         })
         .catch(res => {});
     },
     // 添加常用驾驶人接口
     addDriver(data) {
-      orderApi
-        .addDriver(data)
-        .then(res => {
-          alert("保存成功");
-          this.getDriverList();
-        })
-        .catch(res => {
-          alert("保存失败");
-        });
+      if (this.isSave) {
+        this.isSave = false;
+        orderApi
+          .addDriver(data)
+          .then(res => {
+            this.isSave = true;
+            this.messageLayer("保存成功");
+            this.getDriverList();
+          })
+          .catch(res => {
+            this.messageLayer("保存失败");
+            this.isSave = true;
+          });
+      }
     },
     // 打开驾驶人列表
     openDriver() {
@@ -919,20 +1010,21 @@ export default {
     },
     // 保存驾驶人信息
     saveDriver() {
-      if (!this.fillInInfo.name) return alert("请输入英文名或拼音");
-      if (!this.fillInInfo.surname) return alert("请输入英文姓或拼音");
-      if (!this.fillInInfo.age) return alert("请选择年龄");
-      if (!this.fillInInfo.email) return alert("请输入邮箱");
+      if (!this.fillInInfo.name) return this.messageLayer("请输入英文名或拼音");
+      if (!this.fillInInfo.surname)
+        return this.messageLayer("请输入英文姓或拼音");
+      if (!this.fillInInfo.age) return this.messageLayer("请选择年龄");
+      if (!this.fillInInfo.email) return this.messageLayer("请输入邮箱");
       if (
         this.fillInInfo.email &&
         !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
           this.fillInInfo.email
         )
       )
-        return alert("邮箱格式错误，请重新输入");
-      if (!this.fillInInfo.phone) return alert("请输入电话");
+        return this.messageLayer("邮箱格式错误，请重新输入");
+      if (!this.fillInInfo.phone) return this.messageLayer("请输入电话");
       if (!this.phoneVerification.test(this.fillInInfo.phone))
-        return alert("电话格式错误，请重新输入");
+        return this.messageLayer("电话格式错误，请重新输入");
       let data = {
         name: this.fillInInfo.name,
         surname: this.fillInInfo.surname,
@@ -1048,9 +1140,13 @@ export default {
                   }
                 }
               }
+            } else {
+              this.messageLayer(res.ErrorMsg);
             }
           })
-          .catch(res => {});
+          .catch(res => {
+            this.messageLayer("验证优惠券代码失效");
+          });
       }
     },
     // 提交订单
@@ -1060,24 +1156,26 @@ export default {
         this.costBoxShow = true;
         this.oneClick = false;
       } else {
-        if (!this.fillInInfo.name) return alert("请输入英文名或拼音");
-        if (!this.fillInInfo.surname) return alert("请输入英文姓或拼音");
-        if (!this.fillInInfo.age) return alert("请选择年龄");
-        if (!this.fillInInfo.email) return alert("请输入邮箱");
+        if (!this.fillInInfo.name)
+          return this.messageLayer("请输入英文名或拼音");
+        if (!this.fillInInfo.surname)
+          return this.messageLayer("请输入英文姓或拼音");
+        if (!this.fillInInfo.age) return this.messageLayer("请选择年龄");
+        if (!this.fillInInfo.email) return this.messageLayer("请输入邮箱");
         if (
           this.fillInInfo.email &&
           !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
             this.fillInInfo.email
           )
         )
-          return alert("邮箱格式错误，请重新输入");
-        if (!this.fillInInfo.phone) return alert("请输入电话");
+          return this.messageLayer("邮箱格式错误，请重新输入");
+        if (!this.fillInInfo.phone) return this.messageLayer("请输入电话");
         if (
           !this.phoneVerification.test(
             this.fillInInfo.areacode + this.fillInInfo.phone
           )
         )
-          return alert("电话格式错误，请重新输入");
+          return this.messageLayer("电话格式错误，请重新输入");
         if (this.couponCode) {
           if (this.noUsedTps) return false;
         }
@@ -1088,7 +1186,7 @@ export default {
                 this.fillInInfo.emergencycontacttel
             )
           ) {
-            return alert("紧急联系人电话格式错误，请重新输入");
+            return this.messageLayer("紧急联系人电话格式错误，请重新输入");
           }
         }
         let data = {
@@ -1125,34 +1223,51 @@ export default {
           hotelcode: null, //酒店代码
           referenceid: null //下单唯一标识
         };
-        orderApi
-          .submitOrder(data)
-          .then(res => {
-            if (res.ErrorCode == 0) {
-              if (this.priceInfo.isonline) {
-                // 跳转到在线支付页面
-                this.$router.push({
-                  path: "/orderInfo",
-                  query: { guid: res.Result }
-                });
+        if (this.isNext) {
+          this.isNext = false;
+          this.$loadingTost.show();
+          orderApi
+            .submitOrder(data)
+            .then(res => {
+              this.$loadingToast.close();
+              if (res.ErrorCode == 0) {
+                if (this.priceInfo.isonline) {
+                  // 跳转到在线支付页面
+                  this.$router.push({
+                    path: "/orderInfo",
+                    query: { guid: res.Result }
+                  });
+                } else {
+                  this.$router.push({
+                    path: "/orderInfo",
+                    query: { guid: res.Result }
+                  });
+                }
               } else {
-                this.$router.push({
-                  path: "/orderInfo",
-                  query: { guid: res.Result }
-                });
+                this.messageLayer(res.ErrorMsg);
               }
-            }
-          })
-          .catch(res => {});
+              this.isNext = true;
+              this.$loadingTost.show();
+            })
+            .catch(res => {
+              this.$loadingToast.close();
+              this.isNext = true;
+              this.messageLayer("提交订单失败");
+            });
+        }
       }
     }
   },
   mounted() {
+    this.$loadingToast.show();
+    this.$store.state.takeTransLat = this.$route.query.take.split(",")[0];
+    this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
+    this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
+    this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
     this.getAirLine(); //航空公司列表
     this.getDriverList(); //获取常用驾驶人列表
     this.getAreacode(); //获取国际区号列表
     this.getvehDetails(); //获取保险信息
-    this.getCoupon(); //获取可用优惠券数量
   }
 };
 </script>
@@ -1657,6 +1772,7 @@ export default {
   }
   .shows {
     transform: translateY(-1.57rem);
+    opacity: 1;
   }
   .page-footer {
     position: fixed;

@@ -1,15 +1,32 @@
 <template>
 	<div class="index">
 		<!-- 首页导航 -->
-		<header class="header clear">
+		<header class="header clear" :class="{'active': isShowMenu}">
 			<router-link to="/" class="logo left"><img src="@/assets/images/logo.jpg" alt=""></router-link>
-			<span class="menu right"></span>
+			<span class="user right" @click="isShowMenu = !isShowMenu"></span>
 			<div class="language right">
 				<span></span>
 				<ul>
 					<li></li>
 				</ul>
 			</div>
+            <div class="menu" v-show="isShowMenu">
+				<div class="menuBox">
+					<p class="logined clear" v-if="$store.state.isLogin">
+						<img :src="$store.state.userAvatar" alt="" class="left">
+						<span class="left"><b>ID:</b> 13213213</span>
+					</p>
+					<p class="unLogin" v-else>
+						<router-link to="/">我是会员，立即登录</router-link>
+					</p>
+					<ul>
+						<li v-for="(item, index) in menuLsit" :key="index">
+							<router-link :to="item.href">{{item.title}}</router-link>
+						</li>
+					</ul>
+				</div>
+                
+            </div>
 		</header>
 		<!-- 轮播图 -->
 		<div class="banner">
@@ -52,16 +69,28 @@ import findCar from './common/findCar'
 export default {
 	name: 'index',
 	components: {
-		findCar
+        findCar
 	},
 	data () {
 		return {
+            // banner 图
 			bannerList: [
 				{src: require('@/assets/images/banner_1.jpg'), id: 1},
 				{src: require('@/assets/images/banner_2.jpg'), id: 2},
 				{src: require('@/assets/images/banner_3.jpg'), id: 3},
 				{src: require('@/assets/images/banner_4.jpg'), id: 4},
-			],
+            ],
+            // 导航下拉
+            menuLsit: [
+                {title: '预订', href: '/'},
+                {title: '驾照翻译', href: '/'},
+                {title: '设备和服务', href: '/'},
+                {title: '国内租车', href: '/'},
+                {title: '订单查询', href: '/'},
+                {title: '语言版本', href: '/'},
+                {title: '我是代理商，代理商登录', href: '/'}
+            ],
+            // 栏目列表
 			columnList: [
 				{src: require('@/assets/images/icon_1.jpg'), title: '赫兹金卡会员', href: '/'},
 				{src: require('@/assets/images/icon_2.jpg'), title: '订单查询', href: '/'},
@@ -71,18 +100,21 @@ export default {
 				{src: require('@/assets/images/icon_6.jpg'), title: '优惠活动', href: '/'},
 				{src: require('@/assets/images/icon_7.jpg'), title: '国内租车', href: '/'},
 				{src: require('@/assets/images/icon_8.jpg'), title: '代理商登录', href: '/'},
-			],
+            ],
+            // 合作伙伴列表
 			logoList: [
 				{src: require('@/assets/images/hertz.png')},
 				{src: require('@/assets/images/dollar.png')},
 				{src: require('@/assets/images/thrifty.png')},
 				{src: require('@/assets/images/firefly.png')},
 				{src: require('@/assets/images/ace.png')},
-			]
+			],
+			// 是否显示下来菜单
+			isShowMenu: false
 		}
 	},
 	mounted () {
-		this.initSwiper();
+        this.initSwiper();
 	},
 	methods: {
 		initSwiper () {
@@ -92,23 +124,26 @@ export default {
 				speed: 1000,
 				pagination: '.swiper-pagination',
 			})
-		}
+        },
 	}
 }
 </script>
 
 <style scope lang="less">
-	body {
+	.index {
 		background: #f3f3f5;
 	}
 	/* 头部 */ 
-	header {
+	.header {
 		background: #fff;
 		height: 1.04rem;
 		padding: .30rem .32rem .29rem .27rem;
 		.logo {
 			width: 4.53rem;
 			height: .43rem;
+			img {
+				width: 100%;
+			}
 		}
 		.language {
 			width: .48rem;
@@ -116,13 +151,102 @@ export default {
 			background: url(../assets/images/lang.png) no-repeat center center;
 			background-size: cover;
 		}
-		.menu {
+		.user {
 			width: .45rem;
 			height: .45rem;
 			background: url(../assets/images/user.png) no-repeat center center;
 			background-size: cover;
 			margin-left: .26rem;
+			position: relative;
+			&::after {
+				content: '';
+				width: 2px;
+				height: 100%;
+				position: absolute;
+				left: 50%;
+				top: 0;
+				background: #58595B;
+				transform: rotate(45deg);
+				display: none;
+			}
+			&::before {
+				content: '';
+				width: 2px;
+				height: 100%;
+				position: absolute;
+				left: 50%;
+				top: 0;
+				background: #58595B;
+				transform: rotate(-45deg);
+				display: none;
+			}
 		}
+		&.active {
+			.user {
+				background: none;
+				&::before, &::after {
+					display: block;
+				} 
+			}
+			.language {
+				display: none;
+			}
+		}
+		.menu {
+			position: fixed;
+			left: 0;
+			top: 1.04rem;
+			width: 100%;
+			height: calc(100vh - 1.0rem);
+			z-index: 99;
+			background: rgba(0,0,0,0.5);
+			.menuBox {
+				width: 100%;
+				position: absolute;
+				left: 0;
+				top: 0;
+				padding-bottom: 1.78rem;		
+				background: #fff;	
+				> p {
+					background: #57585A;
+					&.unLogin {
+						line-height: 1.12rem;
+						text-align: center;
+						font-size: .30rem;
+						a {
+                            display: block;
+							color: #FFD100;
+						}
+					}
+					&.logined {
+						padding: .24rem 0 .24rem .41rem; 
+						font-size: .3rem;
+						img {
+							width: .65rem;
+							height: .65rem;
+						}
+						b {
+							color: #FFD100;
+						}
+						span {
+							margin-left: .23rem;
+							line-height: .65rem;
+    						color: #fff;
+						}
+					}
+				}
+				li {
+					color: #3B444F;
+					border-bottom: 1px solid #CFCFCF;
+					line-height: .72rem;
+                    a {
+                        padding-left: .39rem;
+                        display: block;
+                    }
+				}
+			}
+		}
+		
 	}
 
 	/* 轮播图 */ 
@@ -132,6 +256,9 @@ export default {
 		overflow: hidden;
 		.swiper-slide {
 			float: left;
+			img {
+				width: 100%;
+			}
 		}
 		.swiper-pagination-bullet {
 			width: .14rem;
@@ -191,7 +318,7 @@ export default {
 			width: 20%;
 			text-align: center;
 			height: .4rem;
-			line-height: .2rem;
+			line-height: .4rem;
 			img {
 				display: inline-block;
 				max-width: .8rem;
