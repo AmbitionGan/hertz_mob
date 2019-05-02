@@ -11,7 +11,9 @@ const apiUrl = {
     // 获取订单详情
     orderDeatil: '/order/detail/',
     // 获取订单车辆信息
-    orderDeatilCar: '/order/detail/vehicle/'
+    orderDeatilCar: '/order/detail/vehicle/',
+    // 获取服务器时间
+    serverDate: "/server/date/",
 }
 
 /**
@@ -33,7 +35,12 @@ const payApi = {
     // 获取订单车辆信息
     getOrderDeatilCar (params) {
         return Http.get(apiUrl.orderDeatilCar, params);
-    }
+    },
+
+    // 获取服务器时间
+    getServerDate (params) {
+        return Http.get(apiUrl.serverDate, params);
+    },
 }
 
 export default payApi

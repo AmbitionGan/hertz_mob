@@ -8,18 +8,18 @@
     <div class="onlinePayContainer">
       <div class="priceBox">
         <div class="price clear">
-          <h4 class="left">支付订单费用</h4>
-          <span class="right">RMB<b>3200</b></span>
-          <p class="clear">
-            价格浮动频繁，请在<span>44分59秒</span>内完成支付，逾期订单将自动取消
+          <h4 class="left">{{orderTimeOut ? "订单已超时" : "支付订单费用"}}</h4>
+          <span class="right">{{orderDetail.online_currency}}<b>{{orderDetail.online_pay}}</b></span>
+          <p class="clear" v-show="!orderTimeOut">
+            价格浮动频繁，请在<span>{{countMin}}分{{countSec}}秒</span>内完成支付，逾期订单将自动取消
           </p>
         </div>
         <div class="showDetail">
-          <span>查看订单详情</span>
+          <span @click="isShowDetail = !isShowDetail">查看订单详情</span>
         </div>
       </div>
     <!-- 查看详情 -->
-    <div class="lookDeatil">
+    <div class="lookDeatil" v-show="isShowDetail">
       <!-- 车辆信息 -->
       <carDetails />
       <!-- 费用明细 -->
@@ -163,26 +163,20 @@
           </div>
       </div>
     </div>
-      <div class="choosePayType">
+      <div class="choosePayType" v-show="!orderTimeOut">
         <p>请选择支付方式</p>
         <ul>
-          <li>
-            <router-link to="/">
+          <li @click="getPay('alipay')">
               <img src="@/assets/images/alipay.png" alt="" />
               支付宝
-            </router-link>
           </li>
-          <li>
-            <router-link to="/">
+          <li @click="getPay('cloudpay')">
               <img src="@/assets/images/bankpay.png" alt="" />
               银联云闪付
-            </router-link>
           </li>
-          <li>
-            <router-link to="/">
+          <li @click="getPay('unionpay')">
               <img src="@/assets/images/bankpay.png" alt="" />
               银联支付
-            </router-link>
           </li>
         </ul>
       </div>
@@ -247,7 +241,7 @@ export default {
       isShowPromptLayer: false,
 
       // 个人信息弹窗
-      isShowIdentityLayer: false,
+      isShowIdentityLayer: true,
 
       // 订单详情
       orderDetail: {
@@ -261,7 +255,28 @@ export default {
       name: "",
 
       // 身份证号
-      number: ""
+      number: "",
+
+      // 服务器时间
+      serverTime: '',
+
+      // 下单时间
+      postTime: '',
+
+      // 倒计时 分钟
+      countMin: '00',
+
+      // 倒计时 秒钟
+      countSec: '00',
+
+      // 监听服务器时间和下单时间是否都加载完成了
+      loadingNum: 0,
+
+      // 订单是否超时
+      orderTimeOut: false,
+
+      // 是否显示详情
+      isShowDetail: false
     };
   },
   mounted() {
@@ -270,23 +285,40 @@ export default {
   methods: {
     init() {
       this.getOrderDetail();
+      this.getServerTime();
     },
 
     /**
      * @param {String} str 支付类型
      */
     getPay(str) {
+        if  (this.number === '' || this.name === '') {
+            this.messageLayer('请填写身份信息', 0)
+            return
+        }
       let params = {
         address: "",
         guid: this.$route.query.guid,
         href: "",
-        idnumber: "320125199604170018",
-        name: "甘志成",
-        pmode: "306",
+        idnumber: this.number,
+        name: this.name,
         random: Math.random()
           .toString(36)
           .substr(8)
       };
+        switch (str) {
+            case 'alipay':
+                params.pmode = '306'
+                break
+            case 'cloudpay':
+                params.pmode = '423'
+                break
+            case 'unionpay':
+                params.pmode = '126'
+                break
+            default:
+                break
+        }
       this.$loadingToast.show();
       payApi
         .getPay(params)
@@ -334,6 +366,7 @@ export default {
         .then(res => {
           if (res.ErrorCode == 0) {
             this.orderDetail = res.Result[0];
+            this.postTime = this.orderDetail.post_time
             this.getOrderDetailCar();
           } else {
             this.messageLayer(res.ErrorMsg, 0);
@@ -353,6 +386,7 @@ export default {
         .then(res => {
           if (res.ErrorCode == 0) {
             this.orderDetailCar = res.Result;
+            this.loadingNum ++
             this.assignCarInfo();
           } else {
             this.messageLayer(res.ErrorMsg, 0);
@@ -413,13 +447,63 @@ export default {
       this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
       this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
       this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
-    }
+    },
+
+    /**
+     * 获取服务器时间
+     */
+    getServerTime () {
+        payApi.getServerDate(null)
+            .then(res => {
+                if (res.ErrorCode == 0) {
+                    this.serverTime = res.Result
+                    this.loadingNum ++
+                }
+            })
+            .catch(err => {
+                this.messageLayer('获取服务器时间失败', 0)
+            })
+    },
+
+    /**
+     * 获取订单状态 验证是否超时
+     */ 
+    getOrderStatus () {
+        let limit = 45 * 60 * 1000
+        let diff = new Date(this.serverTime).getTime() - new Date(this.postTime).getTime()
+        if (diff > limit) {
+            this.orderTimeOut = true
+        }else{
+            // 剩余时间
+            let surplus = limit - diff
+            let modulo = parseInt(surplus / 1000) % (60 * 60 * 24) % (60 * 60)
+            this.countMin = Math.floor(modulo / 60)
+            this.countSec = modulo % 60
+            let timer = setInterval(() => {
+                surplus -= 1000
+                if (surplus < 1000) {
+                    this.orderTimeOut = true
+                }else{
+                    modulo = parseInt(surplus / 1000) % (60 * 60 * 24) % (60 * 60)
+                    this.countMin = Math.floor(modulo / 60)
+                    this.countSec = modulo % 60
+                }
+            }, 1000)
+        }
+    },
   },
   watch: {
     // 姓名输入
     name() {
       this.name = pubMethod.filterCode(this.name);
-    }
+    },
+
+    // 服务器时间及下单时间是否加载完成 
+    loadingNum () {
+        if (this.loadingNum == 2) {
+            this.getOrderStatus()
+        }
+    },
   }
 };
 </script>
@@ -462,6 +546,10 @@ export default {
     span {
       color: #ffcc00;
       text-decoration: underline;
+      position: relative;
+      &::after {
+
+      }
     }
   }
   .choosePayType {
@@ -472,13 +560,12 @@ export default {
       line-height: 0.9rem;
     }
     li {
-      > a {
         display: block;
-        font-size: 0.3rem;
-        padding-left: 1.97rem;
         line-height: 1.5rem;
         border-bottom: 1px solid #e9e9e9;
         position: relative;
+        font-size: 0.3rem;
+        padding-left: 1.97rem;
         img {
           width: 1.37rem;
           height: 0.75rem;
@@ -487,7 +574,6 @@ export default {
           top: 50%;
           transform: translateY(-50%);
         }
-      }
       &:first-child {
         img {
           width: 0.87rem;

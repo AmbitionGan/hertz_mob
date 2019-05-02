@@ -265,7 +265,7 @@
     <div :class="['cost-box',costBoxShow?'shows':'',]">
       <div class="cost-box-title">费用明细</div>
       <div class="cost-box-info">
-        <div>
+        <div v-if="priceInfo.isonline">
           <p>
             <span>在线支付包含</span>
             <span>
@@ -278,7 +278,7 @@
           </ul>
         </div>
         <div>
-          <p v-if="priceInfo.offline>0">
+          <p v-if="!priceInfo.isonline">
             <span>到店支付包含</span>
             <span>
               <span
@@ -294,7 +294,7 @@
             <li v-if="rateParams.boosterseat>0">儿童座椅 X {{rateParams.boosterseat}}</li>
           </ul>
         </div>
-        <div v-if="priceInfo.offline>0">
+        <div v-if="priceInfo.offline>0&&priceInfo.isonline">
           <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
         </div>
         <div
@@ -327,7 +327,7 @@
     </div>
     <div class="page-footer">
       <div class="page-footer-left">
-        <p>
+        <p v-if="priceInfo.isonline">
           在线需付
           <br>
           {{priceInfo.fromcurrencycode}}
@@ -336,7 +336,7 @@
           约{{priceInfo.tocurrencycode}}
           <span>{{priceInfo.onlinecny}}</span>
         </p>
-        <p v-if="priceInfo.offline>0">
+        <p v-if="!priceInfo.isonline">
           到店需付
           <br>
           约{{priceInfo.fromcurrencycode}}
@@ -705,8 +705,8 @@ export default {
               "T",
               ""
             ); //还车时间
-            if(this.$store.state.isLogined){
-            this.getCoupon(); //获取优惠券信息
+            if (this.$store.state.isLogined) {
+              this.getCoupon(); //获取优惠券信息
             }
             this.rateParams.discountguid =
               "00000000-0000-0000-0000-000000000000"; //打折
@@ -715,14 +715,14 @@ export default {
             this.rateParams.cdpguid = "00000000-0000-0000-0000-000000000000";
             this.rateParams.pcguid = "00000000-0000-0000-0000-000000000000";
             this.$store.state.detailBrands = pubMethod.getBrandLogo(
-res.Result.pickuplocation_details.brands
-).images;
+              res.Result.pickuplocation_details.brands
+            ).images;
             // //取车日期
             this.$store.state.pickupDate = res.Result.pickupdatetime.substring(
               0,
               res.Result.pickupdatetime.indexOf("T")
             );
-
+            // debugger;
             // //取车时间
             this.$store.state.pickupTime = res.Result.pickupdatetime.split(
               "T"
@@ -737,7 +737,9 @@ res.Result.pickuplocation_details.brands
             this.$store.state.returndayofweek = res.Result.returndayofweek;
             // //租借天数
             this.$store.state.dayspan = res.Result.dayspan;
-
+            this.$store.state.detailBrands = pubMethod.getBrandLogo(
+              res.Result.pickuplocation_details.brands
+            ).images;
             // //取车地址
             this.$store.state.picAddress =
               res.Result.pickuplocation_details.description_location_name;
@@ -824,7 +826,7 @@ res.Result.pickuplocation_details.brands
       orderApi
         .getCoupon(this.couponParams)
         .then(res => {
-          this.loadingNum++;
+          // this.loadingNum++;
           if (res.ErrorCode == 0) {
             this.couponList = res.Result;
             if (this.couponList) {
@@ -907,7 +909,6 @@ res.Result.pickuplocation_details.brands
     changeAir(val) {
       this.fillInInfo.airlinecompany = val.title;
       this.isOpenAir = false;
-      console.log(this.fillInInfo.airlinecompany);
     },
     // 选择年龄
     changeAge(val) {
@@ -929,19 +930,17 @@ res.Result.pickuplocation_details.brands
     // 选择国际区号
     changeCode(item) {
       this.fillInInfo.areacode = item.mobileCode;
-      this.phoneVerification =eval( item.Regex.replace("\\/", "/").replace(
-        "\\/",
-        "/"
-      ));
+      this.phoneVerification = eval(
+        item.Regex.replace("\\/", "/").replace("\\/", "/")
+      );
       this.isOpenCode = false;
     },
     // 选择常用联系人国际区号
     changecontactCode(item) {
       this.fillInInfo.emergencycontactcode = item.mobileCode;
-      this.phoneVerifications = eval(item.Regex.replace("\\/", "/").replace(
-        "\\/",
-        "/"
-      ));
+      this.phoneVerifications = eval(
+        item.Regex.replace("\\/", "/").replace("\\/", "/")
+      );
       this.isOpencontactCode = false;
     },
     // 获取常用驾驶人列表
@@ -1200,8 +1199,8 @@ res.Result.pickuplocation_details.brands
           boosterseat: this.rateParams.boosterseat, //儿童座椅
           portablegps: this.rateParams.portablegps, //GPS
           driverguid: this.fillInInfo.guid
-? this.fillInInfo.guid
-: "00000000-0000-0000-0000-000000000000", //常用驾驶人GUID
+            ? this.fillInInfo.guid
+            : "00000000-0000-0000-0000-000000000000", //常用驾驶人GUID
           email: this.fillInInfo.email, //邮箱
           phonenumber: this.fillInInfo.phone, //联系电话
           areacitycode: "+" + this.fillInInfo.areacode, //国际区号
@@ -1217,17 +1216,17 @@ res.Result.pickuplocation_details.brands
           emergencycontactcode: "+" + this.fillInInfo.emergencycontactcode, //紧急联系电话区号
           cardcode: "", //卡类别代码
           cardnumber: "", // 卡号
-          cardholderrph: '', // 信用卡cvc
+          cardholderrph: "", // 信用卡cvc
           cardtype: 1, //卡类别   1 信用卡  2 储蓄卡
-          cardexpiredate: '', //有效期
+          cardexpiredate: "", //有效期
           discountguid: this.rateParams.discountguid, //打折GUID
           fulldiscountguid: this.rateParams.fulldiscountguid, //满减GUID
           cdpguid: this.rateParams.cdpguid, //CDP GUID
           pcguid: this.rateParams.pcguid, //PC GUID
-          channel: 'pc', //渠道（pc，phone，wechat,ios ,android）
-          hotelmembershipid: '', //酒店常旅客号
-          hotelcode: '', //酒店代码
-          referenceid: '' //下单唯一标识
+          channel: "pc", //渠道（pc，phone，wechat,ios ,android）
+          hotelmembershipid: "", //酒店常旅客号
+          hotelcode: "", //酒店代码
+          referenceid: "" //下单唯一标识
         };
         if (this.isNext) {
           this.isNext = false;
@@ -1240,20 +1239,27 @@ res.Result.pickuplocation_details.brands
                 if (this.priceInfo.isonline) {
                   // 跳转到在线支付页面
                   this.$router.push({
-                        path: "/onlinePay",
-                        query: { guid: res.Result,take:this.$route.query.take,ret:this.$route.query.ret }
-                    });
+                    path: "/onlinePay",
+                    query: {
+                      guid: res.Result,
+                      take: this.$route.query.take,
+                      ret: this.$route.query.ret
+                    }
+                  });
                 } else {
                   this.$router.push({
                     path: "/orderInfo",
-                    query: { guid: res.Result,take:this.$route.query.take,ret:this.$route.query.ret }
+                    query: {
+                      guid: res.Result,
+                      take: this.$route.query.take,
+                      ret: this.$route.query.ret
+                    }
                   });
                 }
               } else {
                 this.messageLayer(res.ErrorMsg);
               }
               this.isNext = true;
-              this.$loadingToast.show();
             })
             .catch(res => {
               this.$loadingToast.close();
@@ -1453,8 +1459,9 @@ res.Result.pickuplocation_details.brands
         }
         textarea:disabled,
         input:disabled {
-            color: #333;
+          color: #333;
           background-color: #fff;
+          color: #3b444f;
         }
         img {
           width: 0.25rem;

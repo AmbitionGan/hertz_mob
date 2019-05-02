@@ -656,6 +656,11 @@
           minArr = [];
           var resultArr = [];
           var getIndex = [];
+          this.submitCode.push(this.turnInsureName(code));
+          var newSubmit = this.submitCode.sort(this.compare('order'));
+          newSubmit.forEach(function(value, index, array){
+            that.selectArr.push(value.code);
+          })
           var selectArr= JSON.stringify(that.selectArr);
           that.payOnline = false;
           that.payArrive = false;
@@ -663,14 +668,13 @@
             if(JSON.stringify(value) == selectArr){
               minArr = value;
               getIndex.push(groupIndex);
-              if(that.getSumCount().arrive[index] != ''){
+              if(that.getSumCount().arrive[groupIndex] != ''){
                 that.payOnline = true;
               }else{
                 that.payArrive = true;
               }
             }
           })
-
           //是否有在线付款
           if(arguments[2] == null){
             that.callBackState();
@@ -682,12 +686,12 @@
           //获取价格
           that.getChangePrice(getIndex,arguments[3]);
 
-          if(arguments[2] == null){
-            that.callBackState();
-            that.emptySelect(groupArr);
-          }else{
-            that.emptySelect(groupArr,arguments[2],arguments[3]);
-          }
+          // if(arguments[2] == null){
+          //   that.callBackState();
+          //   that.emptySelect(groupArr);
+          // }else{
+          //   that.emptySelect(groupArr,arguments[2],arguments[3]);
+          // }
         }
         if(minArr.length == 0){
           this.selectIndex = null;
