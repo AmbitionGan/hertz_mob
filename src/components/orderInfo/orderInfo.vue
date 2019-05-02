@@ -1,7 +1,6 @@
 <template>
   <div class="orderInfo-page">
     <choiceCityComHead title="订单信息"></choiceCityComHead>
-    <carDetails></carDetails>
     <!-- ============================待支付==================================== -->
     <div class="info-page-title" v-if="details.order_status=='WaitPay'&&timeOut==false">
       <div class="title-info">
@@ -64,6 +63,8 @@
         <div style="clear:both"></div>
       </div>
     </div>
+    <carDetails></carDetails>
+
     <!-- =============================费用明细=================================== -->
     <div class="detailsCharges">
       <div class="titleCharges" @click.stop="clickOpen('Charges')">
@@ -84,7 +85,7 @@
               <li v-for="(item,index) in details.details_qualifier.split(',')" :key="index">{{item}}</li>
             </ul>
           </div>
-          <div v-if="priceInfo.offline_pay>0">
+          <div v-if="details.offline_pay>0">
             <p>
               <span>到店支付包含</span>
               <span>
@@ -109,7 +110,7 @@
               >{{items}}</li>
             </ul>
           </div>
-          <div v-if="priceInfo.offline_pay>0">
+          <div v-if="details.offline_pay>0">
             <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
           </div>
           <div
@@ -127,7 +128,9 @@
             <p class="discount-info" v-if="details.pc_name">{{details.pc_name}}</p>
           </div>
           <div class="youhuiMessage last-div">
-            <p v-if="details.beforeoffer_pay!=details.beforeoffer_pay">
+            <p
+              v-if="details.discount_name||details.full_discountname||details.cdp_name||details.pc_name"
+            >
               <span>优惠前价格</span>
               <span
                 style="text-decoration: line-through;color:#9EA3AA"
@@ -252,7 +255,6 @@ import orderApi from "@/api/orderCompletion.js";
 import collapseTransition from "@/assets/js/collapse";
 import choiceCityComHead from "@/components/common/choiceCityComHead"; //顶部
 import carDetails from "@/components/common/carDetails";
-import logos from "@/assets/js/common";
 import { common } from "@/assets/mixin/common";
 export default {
   components: {
@@ -277,7 +279,6 @@ export default {
   },
   watch: {
     loadingNum(newValue, oldValue) {
-      console.log(newValue, "???");
       if (newValue == 2) {
         this.$loadingToast.close();
       }
@@ -290,42 +291,43 @@ export default {
         .getCardetails(this.$route.query.guid)
         .then(res => {
           if (res.ErrorCode == 0) {
-            if (res.Result[0]) {
-              this.$store.state.detailBrands = logos.getBrandLogo(
-                res.Result[0].brands
-              );
+            if (res.Result) {
+              // debugger;
+              this.$store.state.detailBrands = pubMethod.getBrandLogo(
+                res.Result.brands
+              ).images;
               // //取车地址
               this.$store.state.picAddress =
-                res.Result[0].pickuplocation_details.description_location_name;
+                res.Result.pickuplocation_details.description_location_name;
               // //还车地址
               this.$store.state.reAddress =
-                res.Result[0].returnlocation_details.description_location_name;
+                res.Result.returnlocation_details.description_location_name;
 
               // //车辆图片地址
-              this.$store.state.image_path = res.Result[0].image_path;
+              this.$store.state.image_path = res.Result.image_path;
               // //车辆简介
               this.$store.state.short_description =
-                res.Result[0].short_description;
+                res.Result.short_description;
               // //乘客数量
               this.$store.state.num_adult_passengers =
-                res.Result[0].num_adult_passengers;
+                res.Result.num_adult_passengers;
               // //大行李数量
               this.$store.state.num_large_suitcase =
-                res.Result[0].num_large_suitcase;
+                res.Result.num_large_suitcase;
               // //小行李数量
               this.$store.state.num_small_suitcase =
-                res.Result[0].num_small_suitcase;
+                res.Result.num_small_suitcase;
               // //自动挡手动挡
               this.$store.state.transmission_type =
-                res.Result[0].transmission_type == 1 ? "automatic" : "手动挡";
-              this.$store.state.carDetails = res.Result[0];
+                res.Result.transmission_type == 1 ? "automatic" : "手动挡";
+              this.$store.state.carDetails = res.Result;
             }
           } else {
             this.messageLayer(res.ErrorMsg);
           }
-          loadingNum++;
+          this.loadingNum++;
         })
-        .catch(err => {
+        .catch(res => {
           this.messageLayer("获取订单车辆信息失败");
         });
     },
@@ -334,7 +336,9 @@ export default {
       this.$router.push({
         path: "/onlinePay",
         query: {
-          guid: this.details.guid
+          guid: this.details.guid,
+          take: this.$route.query.take,
+          ret: this.$route.query.ret
         }
       });
     },
@@ -442,7 +446,7 @@ export default {
           } else {
             this.messageLayer(res.ErrorMsg);
           }
-          loadingNum++;
+          this.loadingNum++;
         })
         .catch(res => {
           this.messageLayer("获取订单详情失败");
@@ -503,10 +507,13 @@ export default {
   },
   mounted() {
     this.$loadingToast.show();
-    this.$store.state.takeTransLat = this.$route.query.take.split(",")[0];
-    this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
-    this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
-    this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
+    if (this.$route.query.take) {
+      this.$store.state.takeTransLat = this.$route.query.take.split(",")[0];
+      this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
+      this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
+      this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
+    }
+
     this.orderDetail(); //获取订单详情
     this.getCardetails(); //获取订单车辆信息
   }

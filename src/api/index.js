@@ -17,8 +17,6 @@ const apiUrl = {
     mapSearchStore: '/network/',
     // 获取热门国家和洲
     landmark: '/landmark/',
-    // 获取支付
-    getPay: '/pay/cn/bank/',
     // 获取国际区号
     areacode: '/areacode/',
     // 账号密码登陆
@@ -66,10 +64,6 @@ const indexApi = {
     // 获取热门国家和洲
     getLandMark (params) {
         return Http.get(apiUrl.landmark, params);
-    },
-    // 获取支付
-    getPay (params) {
-        return Http.post(apiUrl.getPay, params)
     },
     // 获取区号
     getAreaCode (params) {

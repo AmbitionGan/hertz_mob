@@ -1,11 +1,11 @@
 import Http from "./service";
 function encryption(obj) {
-  console.log(obj, "obj");
   for (var key in obj) {
     if (obj[key]) {
       obj[key] = TDES.encrypt(obj[key]);
     }
   }
+  return obj;
 }
 
 /**
@@ -63,7 +63,7 @@ const indexApi = {
   },
   // 添加常用驾驶人列表
   addDriver(params) {
-    return Http.post(apiUrl.add, encryption(params));
+    return Http.post(apiUrl.add, params);
   },
   // 查询订单详细信息
   orderDetail(params) {
@@ -75,7 +75,7 @@ const indexApi = {
   },
   // 获取优惠券信息
   getCoupon(params) {
-    return Http.post(apiUrl.getCoupon, encryption(params));
+    return Http.post(apiUrl.getCoupon, params);
   },
   // 提交订单
   submitOrder(params) {
@@ -83,11 +83,11 @@ const indexApi = {
   },
   // 取消订单
   cancelOrder(params) {
-    return Http.post(apiUrl.cancelOrder, encryption(params));
+    return Http.post(apiUrl.cancelOrder, params);
   },
   // 删除订单
   delOrder(params) {
-    return Http.post(apiUrl.delOrder, encryption(params));
+    return Http.post(apiUrl.delOrder, params);
   },
   // 获取价格信息
   getrate(params) {
@@ -99,15 +99,15 @@ const indexApi = {
   },
   // 输入优惠券代码是否有效
   couponInput(params) {
-    return Http.post(apiUrl.couponInput, encryption(params));
+    return Http.post(apiUrl.couponInput, params);
   },
   //电子邮件发送
   sendEmail(params) {
-    return Http.post(apiUrl.sendEmail, encryption(params));
+    return Http.post(apiUrl.sendEmail, params);
   },
   // 手机短信发送
   sendSms(params) {
-    return Http.post(apiUrl.sendSms, encryption(params));
+    return Http.post(apiUrl.sendSms, params);
   },
   //查看航空公司列表
   getAirLine() {

@@ -61,7 +61,8 @@ export default {
       isOpenCode: false, //区号列表显隐
       codeList: [], //国际区号列表
       phoneVerification: null, //手机号正则验证
-      isSend: true //防止重复提交
+      isSend: true, //防止重复提交
+      isSendE: true
     };
   },
   mounted() {
@@ -87,10 +88,10 @@ export default {
           } else {
             this.messageLayer(res.ErrorMsg);
           }
-          this.$loadingToast.show();
+          this.$loadingToast.close();
         })
         .catch(res => {
-          this.$loadingToast.show();
+          this.$loadingToast.close();
           this.messageLayer("获取国际区号列表失败");
         });
     },
@@ -108,8 +109,8 @@ export default {
     },
     // 发送邮箱接口
     sendEmail() {
-      if (this.isSend) {
-        this.isSend = false;
+      if (this.isSendE) {
+        this.isSendE = false;
         let data = {
           email: this.sendParams.email,
           guid: this.$route.query.guid
@@ -117,18 +118,18 @@ export default {
         orderApi
           .sendEmail(data)
           .then(res => {
-            if (res.ErrorMsg == 0) {
+            if (res.ErrorCode == 0) {
               this.messageLayer("邮箱发送成功");
             } else {
               this.messageLayer(res.ErrorMsg);
             }
-            this.isSend = true;
+            this.isSendE = true;
             this.$loadingToast.close();
           })
           .catch(err => {
             this.$loadingToast.close();
             this.messageLayer("邮箱发送失败");
-            this.isSend = true;
+            this.isSendE = true;
           });
       }
     },
@@ -144,7 +145,7 @@ export default {
         orderApi
           .sendSms(data)
           .then(res => {
-            if (res.ErrorMsg == 0) {
+            if (res.ErrorCode == 0) {
               this.messageLayer("手机短信发送成功");
             } else {
               this.messageLayer(res.ErrorMsg);
@@ -206,9 +207,9 @@ export default {
 .send-page {
   height: 100vh;
   background: #fff;
-  padding-top: 1.03rem;
 
   .page-content {
+    margin-top: 1.03rem;
     padding: 0 0.4rem;
     .content-group {
       width: 100%;
@@ -229,13 +230,13 @@ export default {
         font-size: 0.24rem;
         margin-right: 0.26rem;
         input {
-          color: #707275;
           font-size: 0.24rem;
           display: inline-block;
           width: 46%;
         }
         textarea:disabled,
         input:disabled {
+          color: #333;
           background-color: #fff;
           color: #3b444f;
         }

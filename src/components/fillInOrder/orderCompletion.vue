@@ -231,7 +231,7 @@
           @blur="testCoupon"
         >
         <p class="no-used" v-show="noUsedTps">优惠券代码不可用</p>
-        <div class="locked" v-if="number==2&&!$store.state.isLogined">
+        <div class="locked" v-if="number==2||!$store.state.isLogined">
           <img src="@/assets/images/locked.png" alt>
         </div>
       </div>
@@ -265,7 +265,7 @@
     <div :class="['cost-box',costBoxShow?'shows':'',]">
       <div class="cost-box-title">费用明细</div>
       <div class="cost-box-info">
-        <div>
+        <div v-if="priceInfo.isonline">
           <p>
             <span>在线支付包含</span>
             <span>
@@ -278,7 +278,7 @@
           </ul>
         </div>
         <div>
-          <p v-if="priceInfo.offline>0">
+          <p v-if="!priceInfo.isonline">
             <span>到店支付包含</span>
             <span>
               <span
@@ -294,7 +294,7 @@
             <li v-if="rateParams.boosterseat>0">儿童座椅 X {{rateParams.boosterseat}}</li>
           </ul>
         </div>
-        <div v-if="priceInfo.offline>0">
+        <div v-if="priceInfo.offline>0&&!priceInfo.isonline">
           <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
         </div>
         <div
@@ -327,7 +327,7 @@
     </div>
     <div class="page-footer">
       <div class="page-footer-left">
-        <p>
+        <p v-if="priceInfo.isonline">
           在线需付
           <br>
           {{priceInfo.fromcurrencycode}}
@@ -336,7 +336,7 @@
           约{{priceInfo.tocurrencycode}}
           <span>{{priceInfo.onlinecny}}</span>
         </p>
-        <p v-if="priceInfo.offline>0">
+        <p v-if="!priceInfo.isonline">
           到店需付
           <br>
           约{{priceInfo.fromcurrencycode}}
@@ -608,7 +608,6 @@ export default {
       }
     },
     loadingNum(newValue, oldValue) {
-      console.log(newValue);
       if (newValue == 4) {
         this.$loadingToast.close();
       }
@@ -715,7 +714,9 @@ export default {
               "00000000-0000-0000-0000-000000000000"; //满减
             this.rateParams.cdpguid = "00000000-0000-0000-0000-000000000000";
             this.rateParams.pcguid = "00000000-0000-0000-0000-000000000000";
-
+            this.$store.state.detailBrands = pubMethod.getBrandLogo(
+              res.Result.pickuplocation_details.brands
+            ).images;
             // //取车日期
             this.$store.state.pickupDate = res.Result.pickupdatetime.substring(
               0,
@@ -869,6 +870,7 @@ export default {
         })
         .catch(res => {
           this.priceInfo = {};
+          this.loadingNum++;
           this.messageLayer("获取价格信息失败");
         });
     },
@@ -883,18 +885,24 @@ export default {
       orderApi
         .getAreacode()
         .then(res => {
+          if (res.ErrorCode == 0) {
+            this.codeList = res.Result;
+            this.fillInInfo.areacode = this.codeList[0].mobileCode;
+            this.fillInInfo.emergencycontactcode = this.codeList[0].mobileCode;
+            this.phoneVerification = eval(
+              this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
+            );
+            this.phoneVerifications = eval(
+              this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
+            );
+          } else {
+            this.messageLayer(res.ErrorMsg);
+          }
           this.loadingNum++;
-          this.codeList = res.Result;
-          this.fillInInfo.areacode = this.codeList[0].mobileCode;
-          this.fillInInfo.emergencycontactcode = this.codeList[0].mobileCode;
-          this.phoneVerification = eval(
-            this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
-          );
-          this.phoneVerifications = eval(
-            this.codeList[0].Regex.replace("\\/", "/").replace("\\/", "/")
-          );
         })
-        .catch(res => {});
+        .catch(res => {
+          this.messageLayer("获取国际区号列表失败");
+        });
     },
     // 打开关闭年龄选择
     openAge() {
@@ -944,13 +952,24 @@ export default {
     },
     // 获取常用驾驶人列表
     getDriverList() {
-      orderApi
-        .getDriverList()
-        .then(res => {
-          this.loadingNum++;
-          this.driverList = res.Result;
-        })
-        .catch(res => {});
+      if (this.$store.state.isLogined) {
+        orderApi
+          .getDriverList()
+          .then(res => {
+            if (res.ErrorCode == 0) {
+              this.driverList = res.Result;
+            } else {
+              this.messageLayer(res.ErrorMsg);
+            }
+            this.loadingNum++;
+          })
+          .catch(res => {
+            this.loadingNum++;
+            this.messageLayer("获取常用驾驶人列表失败");
+          });
+      } else {
+        this.loadingNum++;
+      }
     },
     // 添加常用驾驶人接口
     addDriver(data) {
@@ -959,9 +978,13 @@ export default {
         orderApi
           .addDriver(data)
           .then(res => {
+            if (res.ErrorCode == 0) {
+              this.messageLayer("保存成功");
+              this.getDriverList();
+            } else {
+              this.messageLayer(res.ErrorMsg);
+            }
             this.isSave = true;
-            this.messageLayer("保存成功");
-            this.getDriverList();
           })
           .catch(res => {
             this.messageLayer("保存失败");
@@ -1191,6 +1214,7 @@ export default {
             return this.messageLayer("紧急联系人电话格式错误，请重新输入");
           }
         }
+        console.log(this.fillInInfo);
         let data = {
           guid: this.rateParams.guid, //保险 GUID
           infantchildseat: this.rateParams.infantchildseat, //婴儿座椅
@@ -1215,17 +1239,17 @@ export default {
           emergencycontactcode: "+" + this.fillInInfo.emergencycontactcode, //紧急联系电话区号
           cardcode: "", //卡类别代码
           cardnumber: "", // 卡号
-          cardholderrph: null, // 信用卡cvc
+          cardholderrph: "", // 信用卡cvc
           cardtype: 1, //卡类别   1 信用卡  2 储蓄卡
-          cardexpiredate: null, //有效期
+          cardexpiredate: "", //有效期
           discountguid: this.rateParams.discountguid, //打折GUID
           fulldiscountguid: this.rateParams.fulldiscountguid, //满减GUID
           cdpguid: this.rateParams.cdpguid, //CDP GUID
           pcguid: this.rateParams.pcguid, //PC GUID
-          channel: null, //渠道（pc，phone，wechat,ios ,android）
-          hotelmembershipid: null, //酒店常旅客号
-          hotelcode: null, //酒店代码
-          referenceid: null //下单唯一标识
+          channel: "pc", //渠道（pc，phone，wechat,ios ,android）
+          hotelmembershipid: "", //酒店常旅客号
+          hotelcode: "", //酒店代码
+          referenceid: "" //下单唯一标识
         };
         if (this.isNext) {
           this.isNext = false;
@@ -1259,7 +1283,6 @@ export default {
                 this.messageLayer(res.ErrorMsg);
               }
               this.isNext = true;
-              this.$loadingToast.close();
             })
             .catch(res => {
               this.$loadingToast.close();
@@ -1453,13 +1476,13 @@ export default {
         border-bottom: 1px solid #cecece;
         font-size: 0.24rem;
         input {
-          // color: #707275;
           font-size: 0.24rem;
           display: inline-block;
           width: 46%;
         }
         textarea:disabled,
         input:disabled {
+          color: #333;
           background-color: #fff;
           color: #3b444f;
         }
@@ -1639,6 +1662,7 @@ export default {
     bottom: 0;
     transform: translateY(100%);
     transition: all 0.3s;
+    opacity: 0;
     .driver-list-title {
       border-top-left-radius: 0.1rem;
       border-top-right-radius: 0.1rem;

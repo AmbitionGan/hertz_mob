@@ -2,7 +2,24 @@
   <div class="detailPage-body" v-loading="loading">
     <div id="mhz">
       <!-- header -->
-      <get-car-header></get-car-header>
+      <!-- <get-car-header></get-car-header> -->
+      <div class="personal_header">
+        <img src="../../../static/images/goBack-white.png" class="goBack">
+        <div class="detailPage-address-bottom detailPage-address-bottom-header">
+          <div>
+            <p>{{$store.state.picAddress}}</p>
+            <p>{{$store.state.pickupDate}}&nbsp;{{$store.state.pickupdayofweek}}<br>{{$store.state.pickupTime}}</p>
+          </div>
+          <div>
+            <p>{{$store.state.dayspan}}天</p>
+            <p><img src="../../../static/images/jiantou.png" class="jiantou"></p>
+          </div>
+          <div>
+            <p>{{$store.state.reAddress}}</p>
+            <p>{{$store.state.reDate}}&nbsp;{{$store.state.returndayofweek}}<br>{{$store.state.reTime}}</p>
+          </div>
+        </div>
+      </div>
       <div class="detailPage">
         <car-massage></car-massage>
         <!--套餐部分-->
@@ -147,7 +164,7 @@
   import 'element-ui/lib/theme-chalk/index.css';
   import FooterPrice from "../common/footer_price";
   import CarMassage from "../common/carDetails";
-  import GetCarHeader from "../common/getCarHeader";
+//   import GetCarHeader from "../common/getCarHeader";
 
   Vue.use(ElementUI);
 
@@ -155,7 +172,7 @@
 
   export default {
     name: 'carDetails',
-    components: {GetCarHeader, CarMassage, FooterPrice},
+    components: {CarMassage, FooterPrice},
     data() {
       return {
         value2:true,
@@ -328,8 +345,8 @@
           this.$store.state.pickupdayofweek = data.pickupdayofweek
           this.$store.state.dayspan = data.dayspan
           this.$store.state.returndayofweek = data.returndayofweek
-          this.$store.state.picAddress = data.pickuplocation_details.address;
-          this.$store.state.reAddress = data.returnlocation_details.address;
+          this.$store.state.picAddress = data.pickuplocation_details.description_location_name;
+          this.$store.state.reAddress = data.returnlocation_details.description_location_name;
           this.$store.state.detailBrands = this.showLogoSrc(data.pickuplocation_details.brands);
           this.$store.state.pickupDate = this.myDate(data.pickupdatetime);
           this.$store.state.pickupTime = this.myTime(data.pickupdatetime);
@@ -1305,7 +1322,6 @@
       }
       &>p:first-child{
         line-height: 1.4em;
-        height:2.8em;
         overflow: hidden;
       }
       &>p:last-child{
