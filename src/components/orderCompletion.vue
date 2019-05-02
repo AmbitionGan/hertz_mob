@@ -728,8 +728,8 @@ export default {
       if (!this.fillInInfo.age) return alert("请选择年龄");
       if (!this.fillInInfo.email) return alert("请输入邮箱");
       if (!this.fillInInfo.phone) return alert("请输入电话");
-      if (!this.phoneVerification.test(this.fillInInfo.phone))
-        return alert("电话格式错误，请重新输入");
+    //   if (!this.phoneVerification.test(this.fillInInfo.phone))
+        // return alert("电话格式错误，请重新输入");
       let data = {
         name: this.fillInInfo.name,
         surname: this.fillInInfo.surname,
@@ -862,8 +862,8 @@ export default {
         if (!this.fillInInfo.age) return alert("请选择年龄");
         if (!this.fillInInfo.email) return alert("请输入邮箱");
         if (!this.fillInInfo.phone) return alert("请输入电话");
-        if (!this.phoneVerification.test(this.fillInInfo.phone))
-          return alert("电话格式错误，请重新输入");
+        // if (!this.phoneVerification.test(this.fillInInfo.phone))
+        //   return alert("电话格式错误，请重新输入");
         if (this.couponCode) {
           if (this.noUsedTps) return false;
         }
