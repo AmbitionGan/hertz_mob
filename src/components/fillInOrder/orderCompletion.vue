@@ -68,7 +68,8 @@
       <div class="form-group code-group">
         <p @click.stop="openCode" class="codeP">
           +
-          <input type="text" v-model="fillInInfo.areacode" disabled>
+          <!-- <input type="text" v-model="fillInInfo.areacode" disabled> -->
+          <span>{{fillInInfo.areacode}}</span>
           <img src="@/assets/images/bot-jiao.png" :class="{'detailsinverse':isOpenCode}" alt>
         </p>
         <input
@@ -131,7 +132,8 @@
           <div class="form-group code-group">
             <p @click.stop="opencontactCode" class="codeP">
               +
-              <input type="text" v-model="fillInInfo.emergencycontactcode" disabled>
+              <!-- <input type="text" v-model="fillInInfo.emergencycontactcode" disabled> -->
+              <span>{{fillInInfo.emergencycontactcode}}</span>
               <img
                 src="@/assets/images/bot-jiao.png"
                 :class="{'detailsinverse':isOpencontactCode}"
@@ -277,8 +279,10 @@
             <li v-for="(item,index) in onlineInsurance" :key="index">{{item}}</li>
           </ul>
         </div>
-        <div>
-          <p v-if="!priceInfo.isonline">
+        <div
+          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0"
+        >
+          <p>
             <span>到店支付包含</span>
             <span>
               <span
@@ -287,6 +291,13 @@
             </span>
           </p>
           <ul class="insurance-ul">
+            <li v-for="(item,index) in additional" :key="'a'+index">{{item}}</li>
+            <li
+              v-for="(item,index) in onlineInsurance"
+              :key="index"
+              v-if="couponParams.type==2&&onlineInsurance"
+            >{{item}}</li>
+            <!-- 额外服务 -->
             <li v-if="isReturnfare">异地还车费</li>
             <li v-if="rateParams.portablegps>0">GPS</li>
             <li v-if="rateParams.infantchildseat>0">婴儿座椅 X {{rateParams.infantchildseat}}</li>
@@ -294,7 +305,9 @@
             <li v-if="rateParams.boosterseat>0">儿童座椅 X {{rateParams.boosterseat}}</li>
           </ul>
         </div>
-        <div v-if="priceInfo.offline>0&&!priceInfo.isonline">
+        <div
+          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0"
+        >
           <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
         </div>
         <div
@@ -336,7 +349,9 @@
           约{{priceInfo.tocurrencycode}}
           <span>{{priceInfo.onlinecny}}</span>
         </p>
-        <p v-if="!priceInfo.isonline">
+        <p
+          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0"
+        >
           到店需付
           <br>
           约{{priceInfo.fromcurrencycode}}
@@ -465,7 +480,8 @@ export default {
       airList: [], //航空公司列表
       isNext: true, //是否可以下一步  防止重复提交
       isSave: true, //保存常用联系人 防止重复提交
-      loadingNum: 0
+      loadingNum: 0,
+      additional: [] //额外服务
     };
   },
   computed: {
@@ -693,6 +709,17 @@ export default {
               : (this.couponParams.type = 1);
             this.isReturnfare = params.returnfare; //异地还车保险
             this.onlineInsurance = params.inclusions.inclusions_cn.split(","); //在线支付保险
+            this.additional = []; //额外服务
+            for (let index = 0; index < this.onlineInsurance.length; index++) {
+              if (
+                this.onlineInsurance[index] == "额外驾驶人" ||
+                this.onlineInsurance[index] == "燃油" ||
+                this.onlineInsurance[index] == "高级道路救援"
+              ) {
+                this.additional.push(this.onlineInsurance[index]);
+                this.onlineInsurance.splice(index, 1);
+              }
+            }
             this.couponParams.country_code = res.Result.country_code; //国家
             this.couponParams.brands = res.Result.returnlocation_details.brands; //使用品牌
             this.couponParams.stroe = res.Result.pickuplocation; //门店
@@ -1176,45 +1203,43 @@ export default {
     },
     // 提交订单
     placeOrder() {
+      if (!this.fillInInfo.name) return this.messageLayer("请输入英文名或拼音");
+      if (!this.fillInInfo.surname)
+        return this.messageLayer("请输入英文姓或拼音");
+      if (!this.fillInInfo.age) return this.messageLayer("请选择年龄");
+      if (!this.fillInInfo.email) return this.messageLayer("请输入邮箱");
+      if (
+        this.fillInInfo.email &&
+        !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
+          this.fillInInfo.email
+        )
+      )
+        return this.messageLayer("邮箱格式错误，请重新输入");
+      if (!this.fillInInfo.phone) return this.messageLayer("请输入电话");
+      if (
+        !this.phoneVerification.test(
+          this.fillInInfo.areacode + this.fillInInfo.phone
+        )
+      )
+        return this.messageLayer("电话格式错误，请重新输入");
+      if (this.couponCode) {
+        if (this.noUsedTps) return false;
+      }
+      if (this.fillInInfo.emergencycontacttel) {
+        if (
+          !this.phoneVerifications.test(
+            this.fillInInfo.emergencycontactcode +
+              this.fillInInfo.emergencycontacttel
+          )
+        ) {
+          return this.messageLayer("紧急联系人电话格式错误，请重新输入");
+        }
+      }
       if (this.oneClick) {
         this.elastic = true;
         this.costBoxShow = true;
         this.oneClick = false;
       } else {
-        if (!this.fillInInfo.name)
-          return this.messageLayer("请输入英文名或拼音");
-        if (!this.fillInInfo.surname)
-          return this.messageLayer("请输入英文姓或拼音");
-        if (!this.fillInInfo.age) return this.messageLayer("请选择年龄");
-        if (!this.fillInInfo.email) return this.messageLayer("请输入邮箱");
-        if (
-          this.fillInInfo.email &&
-          !/^[0-9A-Za-z][\.-_0-9A-Za-z]*@[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)+$/.test(
-            this.fillInInfo.email
-          )
-        )
-          return this.messageLayer("邮箱格式错误，请重新输入");
-        if (!this.fillInInfo.phone) return this.messageLayer("请输入电话");
-        if (
-          !this.phoneVerification.test(
-            this.fillInInfo.areacode + this.fillInInfo.phone
-          )
-        )
-          return this.messageLayer("电话格式错误，请重新输入");
-        if (this.couponCode) {
-          if (this.noUsedTps) return false;
-        }
-        if (this.fillInInfo.emergencycontacttel) {
-          if (
-            !this.phoneVerifications.test(
-              this.fillInInfo.emergencycontactcode +
-                this.fillInInfo.emergencycontacttel
-            )
-          ) {
-            return this.messageLayer("紧急联系人电话格式错误，请重新输入");
-          }
-        }
-        console.log(this.fillInInfo);
         let data = {
           guid: this.rateParams.guid, //保险 GUID
           infantchildseat: this.rateParams.infantchildseat, //婴儿座椅
@@ -1475,7 +1500,7 @@ export default {
         padding: 0.1rem 0;
         border-bottom: 1px solid #cecece;
         font-size: 0.24rem;
-        input {
+        span {
           font-size: 0.24rem;
           display: inline-block;
           width: 46%;
@@ -1819,7 +1844,7 @@ export default {
     width: 100%;
     background-color: #ffd100;
     .page-footer-left {
-      width: 65%;
+      width: 64%;
       float: left;
       background: #ffd100;
       display: flex;
@@ -1830,7 +1855,7 @@ export default {
       float: right;
       background: #58595b;
       padding: 0.2rem 0.4rem;
-      width: 35%;
+      width: 36%;
       float: right;
       color: #fff;
       p:nth-child(1) {
