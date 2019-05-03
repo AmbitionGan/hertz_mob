@@ -593,8 +593,8 @@
             e: e
           })
           .then(res => {
-            if (!res.ErrorCode) {
-              this.$store.state.timeSpans = data.Result;            
+            if (res.ErrorCode == 0) {
+              this.$store.state.timeSpans = res.Result;            
             } else {
               this.messageLayer(res.ErrorMsg, 0);
             }

@@ -302,9 +302,7 @@ export default {
         href: "",
         idnumber: this.number,
         name: this.name,
-        random: Math.random()
-          .toString(36)
-          .substr(8)
+        random: Math.random().toString(36).substring(2, 7)
       };
         switch (str) {
             case 'alipay':
@@ -326,7 +324,7 @@ export default {
           this.$loadingToast.close();
           if (res.ErrorCode == 0) {
             if (res.Result != "") {
-              // window.open(res.Result)
+                // window.open(res.Result, '_blank');
               location.href = res.Result;
             }
           } else {
@@ -469,6 +467,8 @@ export default {
      * 获取订单状态 验证是否超时
      */ 
     getOrderStatus () {
+        this.serverTime = this.serverTime.replace(/-/g, '/')
+        this.postTime = this.postTime.replace(/-/g, '/').replace('T', ' ')
         let limit = 45 * 60 * 1000
         let diff = new Date(this.serverTime).getTime() - new Date(this.postTime).getTime()
         if (diff > limit) {

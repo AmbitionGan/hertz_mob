@@ -146,7 +146,7 @@
         this.$store.state.payState == 'online'?littleActive=this.$store.state.littleOnline:littleActive=this.$store.state.littleArrive;
         // var url = '/orderCompletion/facility='+this.$store.state.equiChild1+','+this.$store.state.equiChild2+','+this.$store.state.equiChild3+'&facility2='+facility+'&active='+this.$store.state.insureIndex+','+littleActive;
         // window.location.href= url;
-        
+
         let query = {
             guid: this.$route.query.guid,
             facility: this.$store.state.equiChild1+','+this.$store.state.equiChild2+','+this.$store.state.equiChild3,

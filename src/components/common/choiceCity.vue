@@ -131,9 +131,11 @@ export default {
             this.alphabetMove()
 
             // 计算列表高度
-            var listContainer = document.querySelector('.listContainer');
-            listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
-
+            setTimeout(() => {
+                var listContainer = document.querySelector('.listContainer');
+                listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
+            }, 10)
+            
             // 初始化搜索
             this.initSearch()
         },
@@ -235,6 +237,7 @@ export default {
     left: 0;
     top: 0;
     z-index: 10;
+    width: 100%;
 }
 /* 列表区域 */
 .listContainer {

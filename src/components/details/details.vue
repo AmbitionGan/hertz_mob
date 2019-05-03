@@ -249,11 +249,11 @@
     mounted() {
       this.init();
 
-      window.onscroll = function () {
-        if(window.body.scrollTop < document.getElementById("unavailable").offsetTop){
+    //   window.onscroll = function () {
+    //     if(window.body.scrollTop < document.getElementById("unavailable").offsetTop){
 
-        }
-      }
+    //     }
+    //   }
     },
     methods: {
       //获取url
@@ -551,18 +551,19 @@
         this.selectIndex = index;
         //所有小类项
         var groupArr = this.getSumCount().group;
+        this.submitCode = [];
+        this.selectArr = [];
+        this.submitCode.push(this.turnInsureName(code));
+        var newSubmit = this.submitCode.sort(this.compare('order'));
+        newSubmit.forEach(function(value, index, array){
+          that.selectArr.push(value.code);
+        })
         if(this.server[index].state == true){
           var turnCount = 0;
           var getIndex = [];
-          this.selectArr = [];
           that.payOnline = false;
           that.payArrive = false;
           //判断是否有相同项
-          this.submitCode.push(this.turnInsureName(code));
-          var newSubmit = this.submitCode.sort(this.compare('order'));
-          newSubmit.forEach(function(value, index, array){
-            that.selectArr.push(value.code);
-          })
           groupArr.forEach(function(value, index, array){
             var submitStr = that.selectArr.join(",");
             var valueStr = value.join(",");
@@ -656,11 +657,6 @@
           minArr = [];
           var resultArr = [];
           var getIndex = [];
-          this.submitCode.push(this.turnInsureName(code));
-          var newSubmit = this.submitCode.sort(this.compare('order'));
-          newSubmit.forEach(function(value, index, array){
-            that.selectArr.push(value.code);
-          })
           var selectArr= JSON.stringify(that.selectArr);
           that.payOnline = false;
           that.payArrive = false;
@@ -686,12 +682,15 @@
           //获取价格
           that.getChangePrice(getIndex,arguments[3]);
 
-          // if(arguments[2] == null){
-          //   that.callBackState();
-          //   that.emptySelect(groupArr);
-          // }else{
-          //   that.emptySelect(groupArr,arguments[2],arguments[3]);
-          // }
+          if(JSON.parse(selectArr).length == 0){
+            if(arguments[2] == null){
+              that.callBackState();
+              that.emptySelect(groupArr);
+            }else{
+              that.emptySelect(groupArr,arguments[2],arguments[3]);
+            }
+          }
+
         }
         if(minArr.length == 0){
           this.selectIndex = null;
@@ -872,6 +871,7 @@
 
       },
       add:function(param){
+        this.$store.state.insureRateState = true;
         var childNumber = Number(this.$store.state.equiChild1) + Number(this.$store.state.equiChild2) + Number(this.$store.state.equiChild3);
         if(childNumber >= 3){
           this.errorState("座椅数量不能大于3个！")
@@ -909,6 +909,9 @@
               break;
           }
           this.initRate();
+          if(this.$store.state.equiChild1 ==0 && this.$store.state.equiChild2 == 0 && this.$store.state.equiChild3 == 0 && this.$store.state.gpsMenu == false){
+            this.callBackState();
+          }
         }
       },
       /**
@@ -953,6 +956,9 @@
         if(this.$store.state.gpsMenu == false){
           this.equiGps = 0;
           this.$store.state.gpsMenu = false;
+          if(this.$store.state.equiChild1 ==0 && this.$store.state.equiChild2 == 0 && this.$store.state.equiChild3 == 0){
+            this.callBackState();
+          }
         }else{
           this.equiGps = 1;
           this.$store.state.gpsMenu = true;
@@ -970,6 +976,9 @@
           this.$store.state.equiChild2 = 0;
           this.$store.state.equiChild3 = 0;
           this.initRate();
+          if(this.$store.state.gpsMenu == false){
+            this.callBackState();
+          }
         }else{
           this.childState = true;
         }
