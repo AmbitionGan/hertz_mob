@@ -85,7 +85,7 @@
               <li v-for="(item,index) in details.details_qualifier.split(',')" :key="index">{{item}}</li>
             </ul>
           </div>
-          <div v-if="details.offline_pay>0">
+          <div v-if="details.details_qualifier||details.extra_equipment||details.extra_service">
             <p>
               <span>到店支付包含</span>
               <span>
@@ -94,7 +94,14 @@
                 >{{details.offline_currency}} {{details.offline_pay}}</span>
               </span>
             </p>
-            <ul class="insurance-ul" v-if="details.details_qualifier">
+            <!-- 额外服务 -->
+            <ul class="insurance-ul" v-if="details.extra_service">
+              <li
+                v-for="(items,index) in details.extra_service.split(',')"
+                :key="'a'+index"
+              >{{items}}</li>
+            </ul>
+            <ul class="insurance-ul" v-if="details.details_qualifier&&details.order_type!='Online'">
               <li
                 v-for="(i,indexs) in details.details_qualifier.split(',')"
                 :key="'un'+indexs"
@@ -102,12 +109,6 @@
             </ul>
             <ul class="insurance-ul" v-if="details.extra_equipment">
               <li v-for="(item,index) in details.extra_equipment.split(',')" :key="index">{{item}}</li>
-            </ul>
-            <ul class="insurance-ul" v-if="details.extra_service">
-              <li
-                v-for="(items,index) in details.extra_service.split(',')"
-                :key="'a'+index"
-              >{{items}}</li>
             </ul>
           </div>
           <div v-if="details.offline_pay>0">
