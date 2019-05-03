@@ -1,7 +1,6 @@
 <template>
   <div class="orderInfo-page">
     <choiceCityComHead title="订单信息"></choiceCityComHead>
-    <carDetails></carDetails>
     <!-- ============================待支付==================================== -->
     <div class="info-page-title" v-if="details.order_status=='WaitPay'&&timeOut==false">
       <div class="title-info">
@@ -64,6 +63,8 @@
         <div style="clear:both"></div>
       </div>
     </div>
+    <carDetails></carDetails>
+
     <!-- =============================费用明细=================================== -->
     <div class="detailsCharges">
       <div class="titleCharges" @click.stop="clickOpen('Charges')">
@@ -84,7 +85,7 @@
               <li v-for="(item,index) in details.details_qualifier.split(',')" :key="index">{{item}}</li>
             </ul>
           </div>
-          <div v-if="details.offline_pay>0">
+          <div v-if="details.details_qualifier||details.extra_equipment||details.extra_service">
             <p>
               <span>到店支付包含</span>
               <span>
@@ -93,7 +94,14 @@
                 >{{details.offline_currency}} {{details.offline_pay}}</span>
               </span>
             </p>
-            <ul class="insurance-ul" v-if="details.details_qualifier">
+            <!-- 额外服务 -->
+            <ul class="insurance-ul" v-if="details.extra_service">
+              <li
+                v-for="(items,index) in details.extra_service.split(',')"
+                :key="'a'+index"
+              >{{items}}</li>
+            </ul>
+            <ul class="insurance-ul" v-if="details.details_qualifier&&details.order_type!='Online'">
               <li
                 v-for="(i,indexs) in details.details_qualifier.split(',')"
                 :key="'un'+indexs"
@@ -101,12 +109,6 @@
             </ul>
             <ul class="insurance-ul" v-if="details.extra_equipment">
               <li v-for="(item,index) in details.extra_equipment.split(',')" :key="index">{{item}}</li>
-            </ul>
-            <ul class="insurance-ul" v-if="details.extra_service">
-              <li
-                v-for="(items,index) in details.extra_service.split(',')"
-                :key="'a'+index"
-              >{{items}}</li>
             </ul>
           </div>
           <div v-if="details.offline_pay>0">
@@ -127,7 +129,9 @@
             <p class="discount-info" v-if="details.pc_name">{{details.pc_name}}</p>
           </div>
           <div class="youhuiMessage last-div">
-            <p v-if="details.discount_name||details.full_discountname||details.cdp_name||details.pc_name">
+            <p
+              v-if="details.discount_name||details.full_discountname||details.cdp_name||details.pc_name"
+            >
               <span>优惠前价格</span>
               <span
                 style="text-decoration: line-through;color:#9EA3AA"
@@ -288,42 +292,43 @@ export default {
         .getCardetails(this.$route.query.guid)
         .then(res => {
           if (res.ErrorCode == 0) {
-            if (res.Result[0]) {
+            if (res.Result) {
+              // debugger;
               this.$store.state.detailBrands = pubMethod.getBrandLogo(
-                res.Result[0].brands
+                res.Result.brands
               ).images;
               // //取车地址
               this.$store.state.picAddress =
-                res.Result[0].pickuplocation_details.description_location_name;
+                res.Result.pickuplocation_details.description_location_name;
               // //还车地址
               this.$store.state.reAddress =
-                res.Result[0].returnlocation_details.description_location_name;
+                res.Result.returnlocation_details.description_location_name;
 
               // //车辆图片地址
-              this.$store.state.image_path = res.Result[0].image_path;
+              this.$store.state.image_path = res.Result.image_path;
               // //车辆简介
               this.$store.state.short_description =
-                res.Result[0].short_description;
+                res.Result.short_description;
               // //乘客数量
               this.$store.state.num_adult_passengers =
-                res.Result[0].num_adult_passengers;
+                res.Result.num_adult_passengers;
               // //大行李数量
               this.$store.state.num_large_suitcase =
-                res.Result[0].num_large_suitcase;
+                res.Result.num_large_suitcase;
               // //小行李数量
               this.$store.state.num_small_suitcase =
-                res.Result[0].num_small_suitcase;
+                res.Result.num_small_suitcase;
               // //自动挡手动挡
               this.$store.state.transmission_type =
-                res.Result[0].transmission_type == 1 ? "automatic" : "手动挡";
-              this.$store.state.carDetails = res.Result[0];
+                res.Result.transmission_type == 1 ? "automatic" : "手动挡";
+              this.$store.state.carDetails = res.Result;
             }
           } else {
             this.messageLayer(res.ErrorMsg);
           }
-          loadingNum++;
+          this.loadingNum++;
         })
-        .catch(err => {
+        .catch(res => {
           this.messageLayer("获取订单车辆信息失败");
         });
     },
@@ -332,7 +337,9 @@ export default {
       this.$router.push({
         path: "/onlinePay",
         query: {
-          guid: this.details.guid
+          guid: this.details.guid,
+          take: this.$route.query.take,
+          ret: this.$route.query.ret
         }
       });
     },
@@ -440,7 +447,7 @@ export default {
           } else {
             this.messageLayer(res.ErrorMsg);
           }
-          loadingNum++;
+          this.loadingNum++;
         })
         .catch(res => {
           this.messageLayer("获取订单详情失败");
@@ -501,10 +508,13 @@ export default {
   },
   mounted() {
     this.$loadingToast.show();
-    this.$store.state.takeTransLat = this.$route.query.take.split(",")[0];
-    this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
-    this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
-    this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
+    if (this.$route.query.take) {
+      this.$store.state.takeTransLat = this.$route.query.take.split(",")[0];
+      this.$store.state.takeTransLng = this.$route.query.take.split(",")[1];
+      this.$store.state.retTransLat = this.$route.query.ret.split(",")[0];
+      this.$store.state.retTransLng = this.$route.query.ret.split(",")[1];
+    }
+
     this.orderDetail(); //获取订单详情
     this.getCardetails(); //获取订单车辆信息
   }

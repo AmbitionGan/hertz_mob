@@ -81,7 +81,7 @@ export default {
       if (this.isCancel) {
         this.isCancel = false;
         this.$loadingToast.show();
-        this.cancelForm.guid = this.$route.query.guid
+        this.cancelForm.guid = this.$route.query.guid;
         orderApi
           .cancelOrder(this.cancelForm)
           .then(res => {
