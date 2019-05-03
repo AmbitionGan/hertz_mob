@@ -9,7 +9,7 @@
         <span class="spancolor-hui">驾驶员姓名须与驾照、护照拼音/英文一致</span>
         <img
           src="@/assets/images/driversicon.png"
-          v-if="$store.state.isLogined"
+          v-if="$store.state.isLogin"
           alt
           @click="openDriver"
         >
@@ -17,7 +17,7 @@
       <div
         class="fill-in-driversMessage-change form-group"
         @click="openDriver"
-        v-if="!$store.state.isLogined"
+        v-if="!$store.state.isLogin"
       >
         <span>选择常用驾驶人</span>
         <img src="@/assets/images/select.png" alt>
@@ -165,7 +165,7 @@
       <div
         class="save-btn"
         @click="saveDriver"
-        v-if="$store.state.isLogined&&(isModifyN||isModifyS||isModifyA||isModifyE||isModifyAR||isModifyP||isModifyG||isModifyAIR||isModifyPA||isModifyEM||isModifyEME)"
+        v-if="$store.state.isLogin&&(isModifyN||isModifyS||isModifyA||isModifyE||isModifyAR||isModifyP||isModifyG||isModifyAIR||isModifyPA||isModifyEM||isModifyEME)"
       >保存驾驶人至常用驾驶人</div>
     </div>
     <!-- ==============================填写航班信息============================================= -->
@@ -192,8 +192,8 @@
       <div class="fill-in-driversMessage-title form-group" @click="changeCoupon">
         <span class="coupon-name">优惠券</span>
         <p style="float:right;" v-if="number<=0">
-          <i class="origin" v-if="$store.state.isLogined">{{aLen}}张可用</i>
-          <i class="origin" v-if="!$store.state.isLogined">登录后可使用优惠券</i>
+          <i class="origin" v-if="$store.state.isLogin">{{aLen}}张可用</i>
+          <i class="origin" v-if="!$store.state.isLogin">登录后可使用优惠券</i>
           <img src="@/assets/images/select.png" alt>
         </p>
         <div class="selected" v-if="number>0">已选中'{{number}}'张</div>
@@ -224,14 +224,14 @@
         <input
           type="text"
           name
-          v-if="number<2&&$store.state.isLogined"
+          v-if="number<2&&$store.state.isLogin"
           class="form-control discount-code"
           placeholder="优惠券代码"
           v-model="couponCode"
           @blur="testCoupon"
         >
         <p class="no-used" v-show="noUsedTps">优惠券代码不可用</p>
-        <div class="locked" v-if="number==2&&!$store.state.isLogined">
+        <div class="locked" v-if="number==2&&!$store.state.isLogin">
           <img src="@/assets/images/locked.png" alt>
         </div>
       </div>
@@ -705,7 +705,7 @@ export default {
               "T",
               ""
             ); //还车时间
-            if (this.$store.state.isLogined) {
+            if (this.$store.state.isLogin) {
               this.getCoupon(); //获取优惠券信息
             }
             this.rateParams.discountguid =
@@ -972,7 +972,7 @@ export default {
     },
     // 打开驾驶人列表
     openDriver() {
-      if (this.$store.state.isLogined) {
+      if (this.$store.state.isLogin) {
         this.elastic = this.driverListShow = true;
       } else {
         this.$router.push("/login");
@@ -1047,7 +1047,7 @@ export default {
     },
     // 选择优惠券
     changeCoupon() {
-      if (this.$store.state.isLogined) {
+      if (this.$store.state.isLogin) {
         if (this.aLen > 0) {
           this.couponShows = true;
         }

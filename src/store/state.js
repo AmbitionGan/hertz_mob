@@ -122,7 +122,7 @@ const common = {
   // 地图坐标点显示
   mapData: [],
   // 是否已登陆
-  isLogin: false,
+  isLogin: true,
   // 用户id
   userid: 123123,
   // 默认头像

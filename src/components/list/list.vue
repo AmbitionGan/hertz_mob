@@ -209,7 +209,7 @@
       var getDate = decodeURIComponent(param.pd).split(" ")[0];
       var getTime = decodeURIComponent(param.pd).split(" ")[1];
       this.$store.state.takeCarYear = getDate.split("-")[0];
-      this.$store.state.takeCarMonth = Number(getDate.split("-")[1]);
+      this.$store.state.takeCarMonth = getDate.split("-")[1];
       this.$store.state.takeCarMonthCn = pubMethod.monthNumberChangeCn(Number(getDate.split("-")[1]));
       this.$store.state.takeCarDay = getDate.split("-")[2]
       this.$store.state.takeCarweekCn = pubMethod.weekGetDayChangeCn(new Date(getDate).getDay());
@@ -219,7 +219,7 @@
       var getRetDate = decodeURIComponent(param.rd).split(" ")[0];
       var getRetTime = decodeURIComponent(param.rd).split(" ")[1];
       this.$store.state.retCarYear = getRetDate.split("-")[0];
-      this.$store.state.retCarMonth = Number(getRetDate.split("-")[1])
+      this.$store.state.retCarMonth = getRetDate.split("-")[1]
       this.$store.state.retCarMonthCn = pubMethod.monthNumberChangeCn(Number(getRetDate.split("-")[1]));
       this.$store.state.retCarDay = getRetDate.split("-")[2]
       this.$store.state.retCarweekCn = pubMethod.weekGetDayChangeCn(new Date(getRetDate).getDay());
@@ -234,10 +234,10 @@
       this.$store.state.takeCarGuid = param.guid.split(",")[0];
       this.$store.state.takeCarCoor = param.take.split(",")[1]+","+param.take.split(",")[2];
 
-      this.$store.state.takeCarCountry = param.country.split(",")[1];
-      this.$store.state.takeCarBrand = param.brand.split(",")[1];
-      this.$store.state.takeCarGuid = param.guid.split(",")[1];
-      this.$store.state.takeCarCoor = param.ret.split(",")[1]+","+param.take.split(",")[2];
+      this.$store.state.retCarCountry = param.country.split(",")[1];
+      this.$store.state.retCarBrand = param.brand.split(",")[1];
+      this.$store.state.retCarGuid = param.guid.split(",")[1];
+      this.$store.state.retCarCoor = param.ret.split(",")[1]+","+param.take.split(",")[2];
 
       this.$store.state.isCalendarLoaded = true;
 
@@ -748,9 +748,15 @@
         console.log(name);
         console.log(pubMethod.getBrandName(name));
         return pubMethod.getBrandName(name).images;
+      },
+      getData () {
+          location.reload()
       }
     },
-    computed: {}
+    computed: {},
+    watch: {
+        "$route": "getData"
+    }
   }
 </script>
 

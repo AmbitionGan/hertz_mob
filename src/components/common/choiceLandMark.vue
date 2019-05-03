@@ -75,10 +75,12 @@ export default {
          */
         init () {
             this.getLandMark()
-        
-            // 计算列表高度
-            var listContainer = document.querySelector('.listContainer');
-            listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
+
+            setTimeout(() => {
+                // 计算列表高度
+                var listContainer = document.querySelector('.listContainer');
+                listContainer.style.height = window.innerHeight - document.querySelector('.landMarkSearch').clientHeight - document.querySelector('.choiceCityComHead').clientHeight + 'px'
+            }, 10)
 
             // 初始化搜索
             this.initSearch()
