@@ -280,7 +280,7 @@
           </ul>
         </div>
         <div
-          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0"
+          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0||!priceInfo.isonline"
         >
           <p>
             <span>到店支付包含</span>
@@ -306,7 +306,7 @@
           </ul>
         </div>
         <div
-          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0"
+          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0||!priceInfo.isonline"
         >
           <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
         </div>
@@ -350,7 +350,7 @@
           <span>{{priceInfo.onlinecny}}</span>
         </p>
         <p
-          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0"
+          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0||!priceInfo.isonline"
         >
           到店需付
           <br>
