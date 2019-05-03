@@ -350,7 +350,7 @@
           <span>{{priceInfo.onlinecny}}</span>
         </p>
         <p
-          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0"
+          v-if="isReturnfare||rateParams.portablegps>0||rateParams.infantchildseat>0||rateParams.boosterseat>0||additional.length>0"
         >
           到店需付
           <br>
@@ -1854,7 +1854,7 @@ export default {
     .page-footer-right {
       float: right;
       background: #58595b;
-      padding: 0.2rem 0.4rem;
+      padding: 0.2rem 0.3rem;
       width: 36%;
       float: right;
       color: #fff;
