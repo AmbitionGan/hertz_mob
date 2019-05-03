@@ -708,6 +708,7 @@
             that.server[index].state = false;
           })
         }
+        console.log(that.server);
         that.selectArr = [];
         that.submitCode = [];
         that.payOnline = false;
@@ -832,6 +833,19 @@
         this.getSumCount().arrive.forEach(function(value,index){
           getIndex.forEach(function(getValue){
             if(index == Number(getValue) && that.$store.state.payState == "online"){
+              if(that.getSumCount().arrive[index] != ''){
+                that.$store.state.dayTotal = that.getSumCount().dayMoney[index];
+                that.$store.state.allTotal = that.getSumCount().allMoney[index];
+                that.insureGuid = that.getSumCount().guid[index];
+                that.$store.state.littleOnline = index;
+              }else if(that.getSumCount().arrive[index] == ''){
+                that.$store.state.dayArriveTotal = that.getSumCount().dayMoney[index];
+                that.$store.state.allArriveTotal = that.getSumCount().allMoney[index];
+                that.insureArriveGuid = that.getSumCount().guid[index];
+                that.$store.state.resultGroup = that.getSumCount().group[index];
+                that.$store.state.littleArrive = index;
+              }
+            }else if(index == Number(getValue) && that.$store.state.payState == "arrive"){
               if(that.getSumCount().arrive[index] != ''){
                 that.$store.state.dayTotal = that.getSumCount().dayMoney[index];
                 that.$store.state.allTotal = that.getSumCount().allMoney[index];

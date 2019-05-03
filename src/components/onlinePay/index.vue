@@ -27,80 +27,83 @@
         <div class="titleCharges">
           费用明细
         </div>
-          <div class="infoCharges">
-            <div v-if="orderDetail.order_type!='Offline'">
-                <p>
-                <span>在线支付包含</span>
-                <span>
-                    <span class="leftSpan">{{orderDetail.online_currency}}&nbsp;{{orderDetail.online_pay}}</span>
-                    <!-- <span class="rightSpan">约{{orderDetail.}}&nbsp;{{orderDetail.}}</span> -->
-                </span>
-                </p>
-                <ul class="insurance-ul" v-if="orderDetail.order_type=='Online'">
-                <li v-for="(item,index) in orderDetail.details_qualifier.split(',')" :key="index">{{item}}</li>
-                </ul>
-            </div>
-            <div v-if="orderDetail.offline_pay>0">
-                <p>
-                <span>到店支付包含</span>
-                <span>
-                    <span
-                    class="modal-body-leftSpan"
-                    >{{orderDetail.offline_currency}} {{orderDetail.offline_pay}}</span>
-                </span>
-                </p>
-                <ul class="insurance-ul" v-if="orderDetail.details_qualifier">
-                <li
-                    v-for="(i,indexs) in orderDetail.details_qualifier.split(',')"
-                    :key="'un'+indexs"
-                >{{i}}</li>
-                </ul>
-                <ul class="insurance-ul" v-if="orderDetail.extra_equipment">
-                <li v-for="(item,index) in orderDetail.extra_equipment.split(',')" :key="index">{{item}}</li>
-                </ul>
-                <ul class="insurance-ul" v-if="orderDetail.extra_service">
-                <li
-                    v-for="(items,index) in orderDetail.extra_service.split(',')"
-                    :key="'a'+index"
-                >{{items}}</li>
-                </ul>
-            </div>
-            <div v-if="orderDetail.offline_pay>0">
-                <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
-            </div>
-            <div
-                class="youhuiMessage"
-                v-if="orderDetail.discount_name||orderDetail.full_discountname||orderDetail.cdp_name||orderDetail.pc_name"
-            >
-                <p>优惠信息</p>
-                <!--打折优惠名称 -->
-                <p class="discount-info" v-if="orderDetail.discount_name">{{orderDetail.discount_name}}</p>
-                <!--满减优惠名称 -->
-                <p class="discount-info" v-if="orderDetail.full_discountname">{{orderDetail.full_discountname}}</p>
-                <!--CDP优惠名称  -->
-                <p class="discount-info" v-if="orderDetail.cdp_name">{{orderDetail.cdp_name}}</p>
-                <!--PC优惠名称  -->
-                <p class="discount-info" v-if="orderDetail.pc_name">{{orderDetail.pc_name}}</p>
-            </div>
-            <div class="youhuiMessage last-div">
-                <p v-if="orderDetail.beforeoffer_pay != orderDetail.total_pay">
-                <span>优惠前价格</span>
+          <div class="infoCharges" >
+          <div v-if="orderDetail.order_type!='Offline'">
+            <p>
+              <span>在线支付包含</span>
+              <span>
+                <span class="leftSpan">{{orderDetail.online_currency}}&nbsp;{{orderDetail.online_pay}}</span>
+                <!-- <span class="rightSpan">约{{orderDetail.}}&nbsp;{{orderDetail.}}</span> -->
+              </span>
+            </p>
+            <ul class="insurance-ul" v-if="orderDetail.order_type=='Online'">
+              <li v-for="(item,index) in orderDetail.details_qualifier.split(',')" :key="index">{{item}}</li>
+            </ul>
+          </div>
+          <div v-if="orderDetail.details_qualifier||orderDetail.extra_equipment||orderDetail.extra_service">
+            <p>
+              <span>到店支付包含</span>
+              <span>
                 <span
-                    style="text-decoration: line-through;color:#9EA3AA"
-                >{{orderDetail.beforeoffer_currency}}&nbsp;{{orderDetail.beforeoffer_pay}}</span>
-                </p>
-                <p v-if="orderDetail.total_pay>0">
-                <span>订单总额</span>
-                <span class="origin">
-                    {{orderDetail.total_currency}}
-                    <span class="fot-38">{{orderDetail.total_pay}}</span>
-                </span>
-                </p>
-                <p
-                class="last-p spancolor-hui"
-                >约{{orderDetail.exchange_currency}}&nbsp;{{orderDetail.exchange_pay}}</p>
-            </div>
-            </div>
+                  class="modal-body-leftSpan"
+                >{{orderDetail.offline_currency}} {{orderDetail.offline_pay}}</span>
+              </span>
+            </p>
+            <!-- 额外服务 -->
+            <ul class="insurance-ul" v-if="orderDetail.extra_service">
+              <li
+                v-for="(items,index) in orderDetail.extra_service.split(',')"
+                :key="'a'+index"
+              >{{items}}</li>
+            </ul>
+            <ul class="insurance-ul" v-if="orderDetail.details_qualifier&&orderDetail.order_type!='Online'">
+              <li
+                v-for="(i,indexs) in orderDetail.details_qualifier.split(',')"
+                :key="'un'+indexs"
+              >{{i}}</li>
+            </ul>
+            <ul class="insurance-ul" v-if="orderDetail.extra_equipment">
+              <li v-for="(item,index) in orderDetail.extra_equipment.split(',')" :key="index">{{item}}</li>
+            </ul>
+          </div>
+          <div v-if="orderDetail.offline_pay>0">
+            <span class="tips">(门店服务的具体价格和库存需以门店为准，此处价格仅供参考，可能在门店加收额外税费)</span>
+          </div>
+          <div
+            class="youhuiMessage"
+            v-if="orderDetail.discount_name||orderDetail.full_discountname||orderDetail.cdp_name||orderDetail.pc_name"
+          >
+            <p>优惠信息</p>
+            <!--打折优惠名称 -->
+            <p class="discount-info" v-if="orderDetail.discount_name">{{orderDetail.discount_name}}</p>
+            <!--满减优惠名称 -->
+            <p class="discount-info" v-if="orderDetail.full_discountname">{{orderDetail.full_discountname}}</p>
+            <!--CDP优惠名称  -->
+            <p class="discount-info" v-if="orderDetail.cdp_name">{{orderDetail.cdp_name}}</p>
+            <!--PC优惠名称  -->
+            <p class="discount-info" v-if="orderDetail.pc_name">{{orderDetail.pc_name}}</p>
+          </div>
+          <div class="youhuiMessage last-div">
+            <p
+              v-if="orderDetail.discount_name||orderDetail.full_discountname||orderDetail.cdp_name||orderDetail.pc_name"
+            >
+              <span>优惠前价格</span>
+              <span
+                style="text-decoration: line-through;color:#9EA3AA"
+              >{{orderDetail.beforeoffer_currency}}&nbsp;{{orderDetail.beforeoffer_pay}}</span>
+            </p>
+            <p v-if="orderDetail.total_pay>0">
+              <span>订单总额</span>
+              <span class="origin">
+                {{orderDetail.total_currency}}
+                <span class="fot-38">{{orderDetail.total_pay}}</span>
+              </span>
+            </p>
+            <p
+              class="last-p spancolor-hui"
+            >约{{orderDetail.exchange_currency}}&nbsp;{{orderDetail.exchange_pay}}</p>
+          </div>
+        </div>
       </div>
       <!-- 驾驶人信息 -->
       <div class="driver-modular">
